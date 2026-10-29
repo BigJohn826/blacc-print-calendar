@@ -110,41 +110,8 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
   <div class="section-title"><h3>This Week</h3><span>Next 7 days</span></div>
   <div class="week-grid" id="thisWeek"></div>
 
-  <div class="section-title"><h3>Current Flyers</h3><span>Tap the event below for details</span></div>
-  <div class="flyer-grid">
-    <div class="flyer-card">
-      <img src="assets/lake-presidential-oct-30-2026.jpg" alt="All Black Scorpio Bash at Lake Presidential Golf Club flyer">
-      <div class="copy"><b>Oct 30 • Lake Presidential</b><span>All Black Scorpio Bash</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/doubletree-oct-31-2026.jpg" alt="Costume Masquerade Ball at DoubleTree by Hilton flyer">
-      <div class="copy"><b>Oct 31 • DoubleTree</b><span>Costume Masquerade Ball</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/shark-bar-nov-1-2026.jpg" alt="Archie birthday party at Shark Bar flyer">
-      <div class="copy"><b>Nov 1 • Shark Bar</b><span>Archie’s Grateful for My Journey Birthday Party</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/coco-cabana-nov-10-2026.jpg" alt="The SoBe Remix at Coco Cabana flyer">
-      <div class="copy"><b>Nov 10 • Coco Cabana</b><span>The SoBe Remix — A Soulful Salute</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/sagittarius-nov-28-2026.jpg" alt="Season of the Sagittarius flyer">
-      <div class="copy"><b>Nov 28 • Hampton Conference Center</b><span>Season of the Sagittarius</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/ezzytime-dec-6-2026.jpg" alt="Ezzytime Ultimate Game Day Tailgate Watch Party flyer">
-      <div class="copy"><b>Dec 6 • Ezzytime</b><span>Ultimate Game Day Tailgate & Watch Party</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/season-of-hope-dec-12-2026.jpg" alt="Season of Hope Holiday Fundraiser Gala flyer">
-      <div class="copy"><b>Dec 12 • Eloquent Touch</b><span>Season of Hope Holiday Fundraiser Gala</span></div>
-    </div>
-    <div class="flyer-card">
-      <img src="assets/hamilton-jan-1-2027.jpg" alt="New Year's Day at Hamilton Hotel flyer">
-      <div class="copy"><b>Jan 1 • Hamilton Hotel</b><span>New Year's Day</span></div>
-    </div>
-  </div>
+  <div class="section-title"><h3>Current Flyers</h3><span id="flyerMonthLabel">Current month only</span></div>
+  <div class="flyer-grid" id="currentFlyers"></div>
 
   <div class="section-title"><h3>Upcoming Schedule</h3><span>Tap a gig for details</span></div>
   <div class="toolbar">
@@ -203,6 +170,14 @@ function renderWeek(){
  const list=upcoming.filter(e=>parseDate(e.date)<=end),el=document.getElementById("thisWeek");
  el.innerHTML=list.length?list.map(e=>'<div class="week-item"><div><div class="when">'+fmtDay(parseDate(e.date))+'</div><b>'+e.venue+'</b></div><div class="time">'+e.start+'</div></div>').join(''):'<div class="card"><div class="empty">No BPE gigs in the next 7 days.</div></div>';
 }
+function renderCurrentFlyers(){
+ const root=document.getElementById("currentFlyers"),label=document.getElementById("flyerMonthLabel");
+ const month=today.getMonth(),year=today.getFullYear();
+ const current=events.filter(e=>{const d=parseDate(e.date);return d.getMonth()===month&&d.getFullYear()===year&&e.flyer});
+ label.textContent=today.toLocaleDateString("en-US",{month:"long",year:"numeric"});
+ if(!current.length){root.innerHTML='<div class="card"><div class="empty">No flyers currently posted for '+label.textContent+'.</div></div>';return}
+ root.innerHTML=current.map(e=>'<div class="flyer-card"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"><div class="copy"><b>'+fmtDay(parseDate(e.date))+' • '+e.venue+'</b><span>'+(e.notes?e.notes.split(".")[0]:"Event flyer")+'</span></div></div>').join('');
+}
 function renderSchedule(){
  const q=document.getElementById("search").value.toLowerCase().trim(),sf=document.getElementById("statusFilter").value;
  const filtered=upcoming.filter(e=>(!q||(e.venue+" "+e.location+" "+e.notes).toLowerCase().includes(q))&&(!sf||e.status===sf));
@@ -216,7 +191,7 @@ function renderSchedule(){
 }
 document.getElementById("search").addEventListener("input",renderSchedule);
 document.getElementById("statusFilter").addEventListener("change",renderSchedule);
-renderNext();renderWeek();renderSchedule();
+renderNext();renderWeek();renderCurrentFlyers();renderSchedule();
 </script>
 </body>
 </html>
