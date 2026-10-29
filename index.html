@@ -24,10 +24,7 @@ a{color:inherit}
 .wrap{max-width:820px;margin:auto;padding:0 16px 80px}
 .topbar{position:sticky;top:0;z-index:20;margin:0 -16px 18px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:rgba(9,9,11,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}
 .brand{display:flex;align-items:center;gap:12px}
-.mark{width:54px;height:54px;border-radius:16px;background:linear-gradient(145deg,#fff 0 58%,#ececef 100%);display:grid;place-items:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.mark:after{content:"";position:absolute;inset:auto -7px -7px auto;width:30px;height:30px;background:var(--red);transform:rotate(45deg)}
-.mark b{position:relative;z-index:1;color:#111;font-size:18px;letter-spacing:-1.3px;font-weight:950}
-.mark b span{color:var(--red)}
+.brand-logo{width:82px;height:56px;object-fit:contain;background:#fff;border-radius:12px;padding:4px;box-shadow:var(--shadow)}
 .brand h1{font-size:16px;line-height:1.1;margin:0}
 .brand p{font-size:11px;color:var(--muted);margin:4px 0 0}
 .last-updated{font-size:10px;color:#777;margin-top:7px}
@@ -75,6 +72,7 @@ input:focus,select:focus{border-color:#555562}
 .details{border-top:1px solid #26262d;padding:13px}.details p{font-size:12px;line-height:1.55;color:#c4c4ca;margin:10px 0}
 .flag{font-size:10px;color:var(--amber);font-weight:800;margin-top:8px}
 .empty{color:var(--muted);font-size:12px}
+.flyer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.flyer-card{background:#111116;border:1px solid #292930;border-radius:18px;overflow:hidden}.flyer-card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#050505}.flyer-card .copy{padding:11px}.flyer-card b{font-size:12px;display:block}.flyer-card span{font-size:10px;color:var(--muted);display:block;margin-top:3px}.flyer-thumb{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid #2e2e35;background:#09090c}.flyer-thumb img{display:block;width:100%;max-height:620px;object-fit:contain}.flyer-label{font-size:9px;color:var(--red2);font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px}
 footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1.5}
 @media(max-width:520px){.toolbar{grid-template-columns:1fr}.next-name{font-size:24px}.hero h2{font-size:26px}}
 </style>
@@ -83,7 +81,7 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <div class="mark"><b>B<span>P</span>E</b></div>
+      <img class="brand-logo" src="assets/bpe-logo.jpg" alt="Blacc Print Experience logo">
       <div>
         <h1>Blacc Print Experience</h1>
         <p>Calendar Portal</p>
@@ -112,6 +110,14 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
   <div class="section-title"><h3>This Week</h3><span>Next 7 days</span></div>
   <div class="week-grid" id="thisWeek"></div>
 
+  <div class="section-title"><h3>Current Flyers</h3><span>Tap the event below for details</span></div>
+  <div class="flyer-grid">
+    <div class="flyer-card">
+      <img src="assets/coco-cabana-nov-10-2026.jpg" alt="The SoBe Remix at Coco Cabana flyer">
+      <div class="copy"><b>Nov 10 • Coco Cabana</b><span>The SoBe Remix — A Soulful Salute</span></div>
+    </div>
+  </div>
+
   <div class="section-title"><h3>Upcoming Schedule</h3><span>Tap a gig for details</span></div>
   <div class="toolbar">
     <input id="search" type="search" placeholder="Search venue or location">
@@ -127,7 +133,7 @@ const events=[
 {date:"2026-11-01",start:"8:00 PM",end:"11:00 PM",venue:"Shark Bar",location:"2056 Crain Hwy, Waldorf, MD 20601",status:"Confirmed",notes:"",recurring:true},
 {date:"2026-11-07",start:"8:00 PM",end:"11:00 PM",venue:"St Luke's",location:"St Luke's",status:"Needs Details",notes:"Pumpin Archie's Birthday. Exact performance time and address pending.",recurring:false},
 {date:"2026-11-08",start:"8:00 PM",end:"11:00 PM",venue:"LISP",location:"",status:"Confirmed",notes:"Recurring BPE date. Location details will be added when confirmed.",recurring:true},
-{date:"2026-11-10",start:"10:30 PM",end:"1:30 AM",venue:"Coco Cabana",location:"2031 University Blvd, Adelphi, MD 20783",status:"Confirmed",notes:"The SoBe Remix: A Soulful Salute, in honor of Veterans Day. Flyer hours: 8 PM–1:30 AM.",recurring:false},
+{date:"2026-11-10",start:"10:30 PM",end:"1:30 AM",venue:"Coco Cabana",location:"2031 University Blvd, Adelphi, MD 20783",status:"Confirmed",notes:"The SoBe Remix: A Soulful Salute, in honor of Veterans Day. Flyer hours: 8 PM–1:30 AM.",recurring:false,flyer:"assets/coco-cabana-nov-10-2026.jpg"},
 {date:"2026-11-13",start:"8:00 PM",end:"11:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
 {date:"2026-11-14",start:"10:30 PM",end:"11:30 PM",venue:"MGM Diablos",location:"MGM National Harbor",status:"Confirmed",notes:"With Push Play.",recurring:false},
 {date:"2026-11-16",start:"9:00 PM",end:"12:00 AM",venue:"Private Party (Fort Washington)",location:"Fort Washington, MD",status:"Needs Details",notes:"All Black Private Party. Exact venue and additional details pending. Attire: all black.",recurring:false},
@@ -176,7 +182,7 @@ function renderSchedule(){
  if(!filtered.length){root.innerHTML='<div class="card"><div class="empty">No matching gigs.</div></div>';return}
  root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h4>'+month+'</h4>'+arr.map(e=>{
   const d=parseDate(e.date),sameDay=e.date==="2026-12-06";
-  return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(sameDay?'<div class="flag">⚠ Same-day double booking currently listed on December 6.</div>':'')+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.location?'<div class="actions"><a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open in Maps</a></div>':'')+'</div></details>'
+  return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(sameDay?'<div class="flag">⚠ Same-day double booking currently listed on December 6.</div>':'')+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.flyer?'<div class="flyer-label">Event Flyer</div><div class="flyer-thumb"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></div>':'')+(e.location?'<div class="actions"><a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open in Maps</a></div>':'')+'</div></details>'
  }).join('')+'</div>').join('');
 }
 document.getElementById("search").addEventListener("input",renderSchedule);
