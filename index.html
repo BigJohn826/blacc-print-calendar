@@ -116,7 +116,7 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
   <div class="section-title"><h3>Upcoming Schedule</h3><span>Tap a gig for details</span></div>
   <div class="toolbar">
     <input id="search" type="search" placeholder="Search venue or location">
-    <select id="statusFilter"><option value="">All statuses</option><option>Confirmed</option><option>Needs Details</option></select>
+    <select id="statusFilter"><option value="">All statuses</option><option>Confirmed</option><option>Needs Details</option><option>Canceled</option></select>
   </div>
   <div id="schedule"></div>
 
@@ -129,7 +129,7 @@ const events=[
 {date:"2026-11-01",start:"6:00 PM",end:"10:00 PM",venue:"Shark Bar",location:"2056 Crain Highway, Waldorf, MD 20601",status:"Confirmed",attire:"Blue BPE polo",notes:"Archie’s Grateful for My Journey Birthday Party. Flyer lists event hours as 6 PM–10 PM and features Blacc Print Experience. If BPE has a separate hit time, update this entry when confirmed.",recurring:false,flyer:"assets/shark-bar-nov-1-2026.jpg"},
 {date:"2026-11-07",start:"8:00 PM",end:"11:00 PM",venue:"St Luke's",location:"St Luke's",status:"Needs Details",notes:"Pumpin Archie's Birthday. Exact performance time and address pending.",recurring:false},
 {date:"2026-11-08",start:"8:00 PM",end:"11:00 PM",venue:"LISP",location:"",status:"Confirmed",notes:"Recurring BPE date. Location details will be added when confirmed.",recurring:true},
-{date:"2026-11-10",start:"10:30 PM",end:"1:30 AM",venue:"Coco Cabana",location:"2031 University Blvd, Adelphi, MD 20783",status:"Confirmed",notes:"The SoBe Remix: A Soulful Salute, in honor of Veterans Day. Flyer hours: 8 PM–1:30 AM.",recurring:false,flyer:"assets/coco-cabana-nov-10-2026.jpg"},
+{date:"2026-11-10",start:"Canceled",end:"Canceled",venue:"Coco Cabana",location:"2031 University Blvd, Adelphi, MD 20783",status:"Canceled",notes:"CANCELED — The SoBe Remix: A Soulful Salute, in honor of Veterans Day. This show has been canceled.",recurring:false,flyer:"assets/coco-cabana-nov-10-2026.jpg"},
 {date:"2026-11-13",start:"8:00 PM",end:"11:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
 {date:"2026-11-14",start:"10:30 PM",end:"11:30 PM",venue:"MGM Diablos",location:"MGM National Harbor",status:"Confirmed",notes:"With Push Play.",recurring:false},
 {date:"2026-11-16",start:"9:00 PM",end:"12:00 AM",venue:"Private Party (Fort Washington)",location:"Fort Washington, MD",status:"Needs Details",notes:"All Black Private Party. Exact venue and additional details pending. Attire: all black.",recurring:false},
@@ -156,7 +156,7 @@ function parseDate(d){const [y,m,day]=d.split("-").map(Number);return new Date(y
 function fmtMonth(d){return d.toLocaleDateString("en-US",{month:"long",year:"numeric"})}
 function fmtDay(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
 function mapsUrl(loc){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc)}
-function statusClass(s){return s==="Confirmed"?"confirmed":"pending"}
+function statusClass(s){return s==="Confirmed"?"confirmed":s==="Canceled"?"pending":"pending"}
 const today=new Date();today.setHours(0,0,0,0);
 const upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
 function renderNext(){
