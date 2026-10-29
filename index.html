@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blacc Print Calendar Portal</title>
+<style>
+:root{--bg:#080808;--card:#151515;--card2:#1d1d1d;--text:#f7f7f7;--muted:#aaa;--red:#d51f2f;--border:#2a2a2a;--green:#78e0b9;--amber:#ffd27c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:760px;margin:auto;padding:0 16px 70px}
+header{position:sticky;top:0;z-index:10;background:rgba(8,8,8,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 16px;margin:0 -16px 16px;display:flex;align-items:center;gap:12px}
+.logo{width:70px;height:48px;display:grid;place-items:center;background:#fff;color:#111;border-radius:9px;font-weight:950;letter-spacing:-2px;font-size:22px}.logo span{color:var(--red)}
+header h1{font-size:16px;margin:0}header p{font-size:11px;color:var(--muted);margin:3px 0 0}
+h2{font-size:21px;margin:18px 0 10px}.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:12px}.update{border-left:4px solid var(--amber)}.next{border-left:4px solid var(--red)}
+.eyebrow{font-size:10px;letter-spacing:1.3px;color:var(--red);text-transform:uppercase;font-weight:800}.big{font-size:25px;font-weight:900;margin:5px 0}.muted{color:var(--muted);font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.info{background:#0f0f0f;border:1px solid var(--border);border-radius:12px;padding:10px}.info b{display:block;font-size:13px}.info span{font-size:10px;color:var(--muted);text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:0;border-radius:12px;padding:11px 14px;background:var(--red);color:#fff;font-weight:800;text-decoration:none;cursor:pointer}.btn.secondary{background:#1a1a1a;border:1px solid var(--border)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select{background:#141414;color:#fff;border:1px solid var(--border);border-radius:12px;padding:11px;font-size:16px;min-height:44px}input{flex:1;min-width:180px}select{min-width:140px}
+.month{margin-top:20px}.month h3{font-size:16px;margin:0 0 9px;color:#ddd}.gig{background:#131313;border:1px solid var(--border);border-radius:15px;margin-bottom:9px;overflow:hidden}.gig summary{list-style:none;cursor:pointer;padding:13px;display:flex;justify-content:space-between;gap:12px;align-items:center}.gig summary::-webkit-details-marker{display:none}
+.datebox{min-width:56px;text-align:center;border-right:1px solid var(--border);padding-right:10px}.datebox strong{font-size:21px;display:block}.datebox span{font-size:10px;color:var(--muted);text-transform:uppercase}.gigmain{flex:1;min-width:0}.gigmain b{display:block;font-size:14px}.gigmain span{font-size:11px;color:var(--muted)}
+.badge{font-size:9px;padding:5px 7px;border-radius:999px;font-weight:800;white-space:nowrap}.confirmed{background:rgba(50,196,141,.14);color:var(--green)}.pending{background:rgba(242,184,75,.14);color:var(--amber)}.details{border-top:1px solid var(--border);padding:13px}.details p{font-size:12px;color:#ccc;line-height:1.5}footer{margin-top:30px;text-align:center;color:#777;font-size:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">B<span>P</span>E</div><div><h1>Blacc Print Calendar Portal</h1><p>One schedule. One source of truth.</p></div></header>
+
+<section><h2>Recent Updates</h2><div class="card update"><div class="eyebrow">Schedule Update</div><div style="font-weight:800;margin:4px 0">Upcoming BPE dates are loaded</div><div class="muted">Confirmed dates are listed below. Events marked “Needs Details” are placeholders until more information is available.</div></div></section>
+
+<section><h2>Next Gig</h2><div class="card next" id="nextGig"></div></section>
+<section><h2>This Week</h2><div id="thisWeek"></div></section>
+
+<section>
+<div><h2 style="margin-bottom:4px">Upcoming Schedule</h2><div class="muted" style="margin-bottom:12px">Tap any gig to open the details.</div></div>
+<div class="toolbar"><input id="search" type="search" placeholder="Search venue or location"><select id="statusFilter"><option value="">All statuses</option><option>Confirmed</option><option>Needs Details</option></select></div>
+<div id="schedule"></div>
+</section>
+<footer>Blacc Print Experience • Calendar Portal</footer>
+</div>
+
+<script>
+const events=[
+{date:"2026-10-31",start:"10:00 PM",end:"1:00 AM",venue:"DoubleTree by Hilton",location:"300 Army Navy Dr, Arlington, VA 22202",status:"Confirmed",notes:"Costume Masquerade Ball. Flyer hours: 8 PM–1 AM. Performance block on calendar: final three hours.",recurring:false},
+{date:"2026-11-01",start:"8:00 PM",end:"11:00 PM",venue:"Shark Bar",location:"2056 Crain Hwy, Waldorf, MD 20601",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-11-07",start:"8:00 PM",end:"11:00 PM",venue:"St Luke's",location:"St Luke's",status:"Needs Details",notes:"Pumpin Archie's Birthday. Exact performance time and address pending.",recurring:false},
+{date:"2026-11-08",start:"8:00 PM",end:"11:00 PM",venue:"LISP",location:"",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-11-10",start:"10:30 PM",end:"1:30 AM",venue:"Coco Cabana",location:"2031 University Blvd, Adelphi, MD 20783",status:"Confirmed",notes:"The SoBe Remix: A Soulful Salute, in honor of Veterans Day. Flyer hours: 8 PM–1:30 AM.",recurring:false},
+{date:"2026-11-13",start:"8:00 PM",end:"11:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-11-14",start:"10:30 PM",end:"11:30 PM",venue:"MGM Diablos",location:"MGM Diablos",status:"Confirmed",notes:"With Push Play.",recurring:false},
+{date:"2026-11-16",start:"9:00 PM",end:"12:00 AM",venue:"Private Party (Fort Washington)",location:"Fort Washington, MD",status:"Needs Details",notes:"All Black Private Party. Exact venue and additional details pending. Attire: all black.",recurring:false},
+{date:"2026-11-21",start:"5:00 PM",end:"9:00 PM",venue:"House Of Soul",location:"House Of Soul",status:"Confirmed",notes:"All Black Party.",recurring:false},
+{date:"2026-11-27",start:"TBD",end:"TBD",venue:"Germantown",location:"Germantown",status:"Needs Details",notes:"Save the date. Exact venue, address, and performance time pending.",recurring:false},
+{date:"2026-11-27",start:"8:00 PM",end:"11:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-11-28",start:"10:00 PM",end:"1:00 AM",venue:"Hampton Conference Center",location:"Hampton Conference Center",status:"Confirmed",notes:"Season of the Sagittarius. Flyer hours: 8 PM–1 AM.",recurring:false},
+{date:"2026-11-29",start:"6:00 PM",end:"10:00 PM",venue:"Encore",location:"Encore",status:"Needs Details",notes:"Exact venue address pending.",recurring:false},
+{date:"2026-12-05",start:"8:00 PM",end:"11:00 PM",venue:"Private Party",location:"",status:"Needs Details",notes:"Exact venue and performance time not provided. Time shown is placeholder.",recurring:false},
+{date:"2026-12-06",start:"5:00 PM",end:"8:00 PM",venue:"Ezzytime Game Day Experience",location:"3611 Stewart Rd, Forestville, MD",status:"Confirmed",notes:"Ultimate Game Day Tailgate & Watch Party Return. Tailgate starts 10 AM; moves inside 12:30 PM. BPE at halftime and after game.",recurring:false},
+{date:"2026-12-06",start:"8:00 PM",end:"11:00 PM",venue:"Shark Bar",location:"2056 Crain Hwy, Waldorf, MD 20601",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-12-11",start:"8:00 PM",end:"11:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-12-12",start:"9:00 PM",end:"12:00 AM",venue:"Eloquent Touch Ballroom",location:"3914 Bexley Place, Hillcrest Heights, MD 20746",status:"Confirmed",notes:"Season of Hope Holiday Fundraiser Gala. Flyer event hours: 8 PM–midnight.",recurring:false},
+{date:"2026-12-13",start:"8:00 PM",end:"11:00 PM",venue:"LISP",location:"",status:"Confirmed",notes:"",recurring:true},
+{date:"2026-12-25",start:"8:00 PM",end:"11:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
+{date:"2027-01-01",start:"TBD",end:"TBD",venue:"Hamilton Hotel",location:"1001 14th Street NW, Washington, DC",status:"Needs Details",notes:"New Year's Day show featuring Push Play, Sirius Company, and Blacc Print. Performance time pending.",recurring:false},
+{date:"2027-01-15",start:"Trip Hold",end:"Jan 18",venue:"Lakeview Resort",location:"Lakeview Resort",status:"Needs Details",notes:"EzzyTime Winter Ride 27 — MLK weekend, Jan 15–18. Performance day/time TBD.",recurring:false},
+{date:"2027-02-20",start:"9:00 PM",end:"12:00 AM",venue:"Seven Springs Mountain Resort",location:"Seven Springs Mountain Resort",status:"Confirmed",notes:"PJ's Legacy Ski Trip. Saturday BPE & DJ Supa Dan party; separate after-party follows.",recurring:false},
+{date:"2027-05-08",start:"TBD",end:"TBD",venue:"Diamond Lounge",location:"Diamond Lounge, VA",status:"Needs Details",notes:"BPE with Push Play. Performance time and exact address pending.",recurring:false},
+{date:"2027-08-14",start:"TBD",end:"TBD",venue:"We R One Kenny's Birthday with Rare Essence",location:"",status:"Needs Details",notes:"Save the date. Venue and performance time pending.",recurring:false},
+{date:"2027-09-16",start:"Trip Hold",end:"Sep 19",venue:"Hilton Head National RV Resort",location:"36 Hilton Head National Drive, Bluffton, SC 29910",status:"Needs Details",notes:"Hilton Head Music Fest and Pool Party, Sep 16–19. Performance day/time TBD.",recurring:false}
+];
+function parseDate(d){const [y,m,day]=d.split("-").map(Number);return new Date(y,m-1,day)}
+function fmtMonth(d){return d.toLocaleDateString("en-US",{month:"long",year:"numeric"})}
+function fmtDay(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
+function mapsUrl(loc){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc)}
+function statusClass(s){return s==="Confirmed"?"confirmed":"pending"}
+const today=new Date();
+today.setHours(0,0,0,0);
+const upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+function renderNext(){const e=upcoming[0];const el=document.getElementById("nextGig");if(!e){el.innerHTML='<div class="muted">No upcoming gigs currently listed.</div>';return}const d=parseDate(e.date);el.innerHTML='<div class="eyebrow">'+(e.recurring?'Recurring Gig':'Upcoming Gig')+'</div><div class="big">'+e.venue+'</div><div class="muted">'+fmtDay(d)+' • '+e.start+(e.end&&e.end!=="TBD"?'–'+e.end:'')+'</div><div class="grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+e.status+'</b><span>Status</span></div></div><div class="row" style="margin-top:12px">'+(e.location?'<a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Directions</a>':'')+'</div>'}
+function renderWeek(){const end=new Date(today);end.setDate(today.getDate()+6);const list=upcoming.filter(e=>parseDate(e.date)<=end);const el=document.getElementById("thisWeek");el.innerHTML=list.length?list.map(e=>'<div class="card"><div class="eyebrow">'+fmtDay(parseDate(e.date))+'</div><div style="font-weight:850;margin-top:4px">'+e.venue+'</div><div class="muted">'+e.start+'</div></div>').join(''):'<div class="card"><div class="muted">No BPE gigs in the next 7 days.</div></div>'}
+function renderSchedule(){const q=document.getElementById("search").value.toLowerCase().trim(),sf=document.getElementById("statusFilter").value;const filtered=upcoming.filter(e=>(!q||(e.venue+" "+e.location+" "+e.notes).toLowerCase().includes(q))&&(!sf||e.status===sf));const grouped={};filtered.forEach(e=>{const k=fmtMonth(parseDate(e.date));(grouped[k]??=[]).push(e)});const root=document.getElementById("schedule");if(!filtered.length){root.innerHTML='<div class="card"><div class="muted">No matching gigs.</div></div>';return}root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h3>'+month+'</h3>'+arr.map(e=>{const d=parseDate(e.date);return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.location?'<div class="row"><a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open Maps</a></div>':'')+'</div></details>'}).join('')+'</div>').join('')}
+document.getElementById("search").addEventListener("input",renderSchedule);document.getElementById("statusFilter").addEventListener("change",renderSchedule);renderNext();renderWeek();renderSchedule();
+</script>
+</body>
+</html>
