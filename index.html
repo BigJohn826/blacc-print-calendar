@@ -75,7 +75,7 @@ input:focus,select:focus{border-color:#555562}
 .flag{font-size:10px;color:var(--amber);font-weight:800;margin-top:8px}.important-detail{margin:10px 0;padding:11px 12px;border:1px solid rgba(255,64,85,.45);border-left:4px solid var(--red2);border-radius:12px;background:rgba(216,31,53,.10)}.important-detail span{display:block;font-size:9px;color:var(--red2);font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}.important-detail b{font-size:15px;color:#fff}
 .empty{color:var(--muted);font-size:12px}
 .flyer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.flyer-card{background:#111116;border:1px solid #292930;border-radius:18px;overflow:hidden}.flyer-card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#050505}.flyer-card .copy{padding:11px}.flyer-card b{font-size:12px;display:block}.flyer-card span{font-size:10px;color:var(--muted);display:block;margin-top:3px}.flyer-thumb{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid #2e2e35;background:#09090c}.flyer-thumb img{display:block;width:100%;max-height:620px;object-fit:contain}.flyer-label{font-size:9px;color:var(--red2);font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px}
-.install-bar{display:none;margin:12px 0 0}.archive-wrap{margin-top:22px}.archive-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.archive-head h3{font-size:19px;margin:0}.archive-list{display:none}.archive-list.open{display:block}.mini-btn{appearance:none;border:1px solid #303039;background:#17171c;color:#fff;border-radius:11px;padding:9px 12px;font-size:11px;font-weight:850}footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1.5}
+.install-bar{display:none;margin:12px 0 0}.utility-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0}.utility-row .btn{flex:0 0 auto}.notice{font-size:10px;color:var(--muted);margin-top:8px}.archive-wrap{margin-top:22px}.archive-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.archive-head h3{font-size:19px;margin:0}.archive-list{display:none}.archive-list.open{display:block}.mini-btn{appearance:none;border:1px solid #303039;background:#17171c;color:#fff;border-radius:11px;padding:9px 12px;font-size:11px;font-weight:850}footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1.5}
 @media(max-width:520px){.toolbar{grid-template-columns:1fr}.next-name{font-size:24px}.hero h2{font-size:26px}}
 </style>
 </head>
@@ -98,6 +98,8 @@ input:focus,select:focus{border-color:#555562}
   </section>
 
   <div class="install-bar" id="installBar"><button class="btn secondary" id="installBtn" type="button">Install Portal</button></div>
+  <div class="utility-row"><button class="btn secondary" id="shareBtn" type="button">Share Portal</button><button class="btn secondary" id="copyBtn" type="button">Copy Link</button><a class="btn secondary" href="mailto:music4lifebeats@gmail.com?subject=BPE%20Portal%20Update&body=Date%3A%0AVenue%3A%0APerformance%20Time%3A%0AArrival%20Time%20(if%20different%20from%2030%20minutes%20prior)%3A%0ALocation%3A%0AAttire%3A%0ANotes%3A" id="updateRequest">Submit Update</a></div>
+  <div class="notice">Schedule changes sent through this portal can be routed into the same update workflow used for the Music4Life calendar and BandSync Portal.</div>
 
   <div class="section-title"><h3>Recent Updates</h3><span>Latest important changes</span></div>
   <div class="card">
@@ -253,6 +255,14 @@ document.getElementById("installBtn").addEventListener("click",async()=>{
  if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;document.getElementById("installBar").style.display="none";
 });
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js"));
+document.getElementById("shareBtn").addEventListener("click",async()=>{
+ const data={title:"Blacc Print Experience Calendar Portal",text:"BPE schedule, flyers and updates",url:location.href};
+ if(navigator.share){try{await navigator.share(data)}catch(e){}}
+ else{await navigator.clipboard.writeText(location.href);document.getElementById("shareBtn").textContent="Link Copied";setTimeout(()=>document.getElementById("shareBtn").textContent="Share Portal",1800)}
+});
+document.getElementById("copyBtn").addEventListener("click",async()=>{
+ try{await navigator.clipboard.writeText(location.href);const b=document.getElementById("copyBtn");b.textContent="Copied";setTimeout(()=>b.textContent="Copy Link",1500)}catch(e){}
+});
 loadData();
 </script>
 </body>
