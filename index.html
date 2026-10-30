@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BPE Calendar">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/bpe-logo.jpg">
 <title>Blacc Print Calendar Portal</title>
 <style>
 :root{
@@ -73,7 +75,7 @@ input:focus,select:focus{border-color:#555562}
 .flag{font-size:10px;color:var(--amber);font-weight:800;margin-top:8px}.important-detail{margin:10px 0;padding:11px 12px;border:1px solid rgba(255,64,85,.45);border-left:4px solid var(--red2);border-radius:12px;background:rgba(216,31,53,.10)}.important-detail span{display:block;font-size:9px;color:var(--red2);font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}.important-detail b{font-size:15px;color:#fff}
 .empty{color:var(--muted);font-size:12px}
 .flyer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.flyer-card{background:#111116;border:1px solid #292930;border-radius:18px;overflow:hidden}.flyer-card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#050505}.flyer-card .copy{padding:11px}.flyer-card b{font-size:12px;display:block}.flyer-card span{font-size:10px;color:var(--muted);display:block;margin-top:3px}.flyer-thumb{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid #2e2e35;background:#09090c}.flyer-thumb img{display:block;width:100%;max-height:620px;object-fit:contain}.flyer-label{font-size:9px;color:var(--red2);font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px}
-footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1.5}
+.install-bar{display:none;margin:12px 0 0}.archive-wrap{margin-top:22px}.archive-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.archive-head h3{font-size:19px;margin:0}.archive-list{display:none}.archive-list.open{display:block}.mini-btn{appearance:none;border:1px solid #303039;background:#17171c;color:#fff;border-radius:11px;padding:9px 12px;font-size:11px;font-weight:850}footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1.5}
 @media(max-width:520px){.toolbar{grid-template-columns:1fr}.next-name{font-size:24px}.hero h2{font-size:26px}}
 </style>
 </head>
@@ -85,7 +87,7 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
       <div>
         <h1>Blacc Print Experience</h1>
         <p>Calendar Portal</p>
-        <div class="last-updated">Last updated: October 29, 2026</div>
+        <div class="last-updated">Last updated: October 30, 2026</div>
       </div>
     </div>
   </div>
@@ -94,6 +96,8 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
     <h2>Blacc Print Experience</h2>
     <p>Performance dates, times, locations, flyers, and important schedule changes.</p>
   </section>
+
+  <div class="install-bar" id="installBar"><button class="btn secondary" id="installBtn" type="button">Install Portal</button></div>
 
   <div class="section-title"><h3>Recent Updates</h3><span>Latest important changes</span></div>
   <div class="card">
@@ -116,49 +120,19 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
   </div>
   <div id="schedule"></div>
 
+  <div class="archive-wrap"><div class="archive-head"><h3>Past Shows</h3><button class="mini-btn" id="archiveToggle" type="button">Show Archive</button></div><div class="archive-list" id="archive"></div></div>
+
   <footer>Blacc Print Experience • Mobile Calendar Portal<br>Save this page to your phone for quick access.</footer>
 </div>
 <script>
-const recentUpdates=[
-  {title:"Nov. 16 — Arrival time added",text:"BPE must arrive no later than 6:45 PM for Asia’s Surprise Birthday Party.",alert:true},
-  {title:"Nov. 28 — Show removed",text:"The Hampton Conference Center / Season of the Sagittarius show has been canceled and removed from the schedule.",alert:true},
-  {title:"Takoma Station — Times updated",text:"Remaining Takoma Station shows are now scheduled for 7:30 PM–10:00 PM."},
-  {title:"Nov. 27 — Performance time updated",text:"BPE now performs at 11:45 PM at Mojito’s Bar and Grill for the Black Friday Party."},
-  {title:"Nov. 16 — Party details updated",text:"Doors open at 6:30 PM, party starts at 7:00 PM, and BPE performs at 9:00 PM. Close out the first set with the Birthday Song."}
-];
-const events=[
-{date:"2026-10-30",start:"10:00 PM",end:"12:00 AM",venue:"Lake Presidential Golf Club",location:"3151 Presidential Golf Dr, Upper Marlboro, MD",status:"Confirmed",notes:"All Black Scorpio Bash presented by Eye on the City Entertainment. BPE performance time: 10 PM. Flyer lists overall event hours as 8 PM–12 AM.",recurring:false,flyer:"assets/lake-presidential-oct-30-2026.jpg"},
-{date:"2026-10-31",start:"10:00 PM",end:"1:00 AM",venue:"DoubleTree by Hilton",location:"300 Army Navy Dr, Arlington, VA 22202",status:"Confirmed",attire:"Black BPE polo and black pants",notes:"Costume Masquerade Ball. Flyer hours: 8 PM–1 AM. BPE performance block: 10 PM–1 AM.",recurring:false,flyer:"assets/doubletree-oct-31-2026.jpg"},
-{date:"2026-11-01",start:"6:00 PM",end:"10:00 PM",venue:"Shark Bar",location:"2056 Crain Highway, Waldorf, MD 20601",status:"Confirmed",attire:"Blue BPE polo",notes:"Archie’s Grateful for My Journey Birthday Party. Flyer lists event hours as 6 PM–10 PM and features Blacc Print Experience. If BPE has a separate hit time, update this entry when confirmed.",recurring:false,flyer:"assets/shark-bar-nov-1-2026.jpg"},
-{date:"2026-11-07",start:"7:00 PM",end:"12:00 AM",venue:"St. Luke’s Center",location:"4923 East Capitol Street SE, Washington, DC",status:"Confirmed",notes:"Archie & Archie All Out Crank — Scorpio Take Over featuring Blacc Print Experience and DJ Pumpin Archie. Flyer event hours: 7 PM–12 AM.",recurring:false,flyer:"assets/st-lukes-nov-7-2026.jpg"},
-{date:"2026-11-08",start:"8:00 PM",end:"11:00 PM",venue:"LISP",location:"",status:"Confirmed",notes:"Recurring BPE date. Location details will be added when confirmed.",recurring:true},
-{date:"2026-11-13",start:"7:30 PM",end:"10:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
-{date:"2026-11-14",start:"10:30 PM",end:"11:30 PM",venue:"Diablos Cantina — MGM National Harbor",location:"101 MGM National Ave, Oxon Hill, MD 20745",status:"Confirmed",notes:"The Scene Edition — Celebrating Scorpio Season. Flyer event hours: 9 PM–2 AM. Live performances by Push Play ft. D. Floyd and Blacc Print. BPE performance time remains 10:30–11:30 PM.",recurring:false,flyer:"assets/mgm-nov-14-2026.jpg"},
-{date:"2026-11-16",start:"9:00 PM",end:"TBD",venue:"Asia’s Surprise Birthday Party",location:"Fort Washington, MD",status:"Needs Details",arrival:"No later than 6:45 PM",notes:"Surprise party for Asia’s boyfriend. Doors open at 6:30 PM; party starts at 7:00 PM; BPE performs at 9:00 PM. Close out first set with the Birthday Song. Exact address pending.",recurring:false},
-{date:"2026-11-21",start:"5:00 PM",end:"9:00 PM",venue:"House Of Soul",location:"House Of Soul",status:"Confirmed",notes:"All Black Party.",recurring:false},
-{date:"2026-11-27",start:"11:45 PM",end:"1:45 AM",venue:"Mojito’s Bar and Grill",location:"8035 Snouffer School Rd, Gaithersburg, MD",status:"Confirmed",notes:"Black Friday Party featuring Blacc Print Experience and a guest band TBA. Doors/event hours: 9 PM–1:45 AM. BPE performance starts at 11:45 PM.",recurring:false},
-{date:"2026-11-27",start:"7:30 PM",end:"10:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
-{date:"2026-11-29",start:"6:00 PM",end:"10:00 PM",venue:"Encore",location:"",status:"Needs Details",notes:"Exact venue address pending.",recurring:false},
-{date:"2026-12-05",start:"8:00 PM",end:"11:00 PM",venue:"Private Party",location:"",status:"Needs Details",notes:"Exact venue and performance time not provided. Time shown is a placeholder.",recurring:false},
-{date:"2026-12-06",start:"5:00 PM",end:"8:00 PM",venue:"Ezzytime Game Day Experience",location:"3611 Stewart Rd, Forestville, MD",status:"Confirmed",notes:"Ultimate Game Day Tailgate & Watch Party. Tailgate starts 10 AM; moves inside 12:30 PM. BPE at halftime and after the game.",recurring:false,flyer:"assets/ezzytime-dec-6-2026.jpg"},
-{date:"2026-12-06",start:"8:00 PM",end:"11:00 PM",venue:"Shark Bar",location:"2056 Crain Hwy, Waldorf, MD 20601",status:"Confirmed",notes:"Same-day schedule: follows the Ezzytime event currently listed 5–8 PM.",recurring:true},
-{date:"2026-12-11",start:"7:30 PM",end:"10:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
-{date:"2026-12-12",start:"9:00 PM",end:"12:00 AM",venue:"Eloquent Touch Ballroom",location:"3914 Bexley Place, Hillcrest Heights, MD 20746",status:"Confirmed",notes:"Season of Hope Holiday Fundraiser Gala. Flyer event hours: 8 PM–midnight.",recurring:false,flyer:"assets/season-of-hope-dec-12-2026.jpg"},
-{date:"2026-12-13",start:"8:00 PM",end:"11:00 PM",venue:"LISP",location:"",status:"Confirmed",notes:"Recurring BPE date. Location details will be added when confirmed.",recurring:true},
-{date:"2026-12-25",start:"7:30 PM",end:"10:00 PM",venue:"Takoma Station",location:"6914 4th St NW, Washington, DC 20012",status:"Confirmed",notes:"",recurring:true},
-{date:"2027-01-01",start:"TBD",end:"TBD",venue:"Hamilton Hotel",location:"1001 14th Street NW, Washington, DC",status:"Needs Details",notes:"New Year's Day show featuring Push Play, Sirius Company, and Blacc Print. Performance time pending.",recurring:false,flyer:"assets/hamilton-jan-1-2027.jpg"},
-{date:"2027-01-15",start:"Trip Hold",end:"Jan 18",venue:"Lakeview Resort",location:"Lakeview Resort",status:"Needs Details",notes:"EzzyTime Winter Ride 27 — MLK Weekend, Jan 15–18. Features Blacc Print Experience and multiple DJs. Performance day/time TBD.",recurring:false,flyer:"assets/winter-ride-jan-15-18-2027.jpg"},
-{date:"2027-02-20",start:"9:00 PM",end:"12:00 AM",venue:"Seven Springs Mountain Resort",location:"777 Waterwheel Drive, Champion, PA 15622",status:"Confirmed",notes:"PJ’s Legacy Ski Trip runs Feb 19–21. Saturday All Black Party featuring Blacc Print Experience with DJ SupaDan. BPE performance block remains 9 PM–12 AM.",recurring:false,flyer:"assets/seven-springs-feb-19-21-2027.jpg"},
-{date:"2027-05-08",start:"TBD",end:"TBD",venue:"Diamond Lounge",location:"Virginia",status:"Needs Details",notes:"BPE with Push Play. Performance time and exact address pending.",recurring:false},
-{date:"2027-08-14",start:"TBD",end:"TBD",venue:"We R One — Kenny's Birthday with Rare Essence",location:"",status:"Needs Details",notes:"Save the date. Venue and performance time pending.",recurring:false},
-{date:"2027-08-28",start:"3:00 PM",end:"TBD",venue:"Funk Fest Virginia Beach Pool Party",location:"1075 General Booth Blvd, Virginia Beach, VA",status:"Confirmed",notes:"Transparent Entertainment presents Funk Fest Virginia Beach Pool Party. Featuring Blacc Print Experience. Event starts at 3 PM; exact BPE performance time pending.",recurring:false,flyer:"assets/virginia-beach-aug-28-2027.jpg"},
-{date:"2027-09-16",start:"Trip Hold",end:"Sep 19",venue:"Hilton Head National RV Resort",location:"36 Hilton Head National Drive, Bluffton, SC 29910",status:"Needs Details",notes:"Hilton Head Music Fest and Pool Party, Sep 16–19. Featuring Blacc Print Experience, The Back In The Day Band, Nothing But A Feeling, and Regina Belle. Performance day/time TBD.",recurring:false,flyer:"assets/hilton-head-sep-16-19-2027.jpg"}
-];
+let events=[],recentUpdates=[],upcoming=[],archived=[];
+const today=new Date();today.setHours(0,0,0,0);
+
 function parseDate(d){const [y,m,day]=d.split("-").map(Number);return new Date(y,m-1,day)}
 function fmtMonth(d){return d.toLocaleDateString("en-US",{month:"long",year:"numeric"})}
 function fmtDay(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
 function mapsUrl(loc){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc)}
-function statusClass(s){return s==="Confirmed"?"confirmed":s==="Canceled"?"pending":"pending"}
+function statusClass(s){return s==="Confirmed"?"confirmed":"pending"}
 function defaultArrival(start){
  if(!start||start==="TBD"||start==="Trip Hold"||start==="Canceled")return "";
  const m=start.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -166,16 +140,44 @@ function defaultArrival(start){
  let h=parseInt(m[1],10),min=parseInt(m[2],10),ampm=m[3].toUpperCase();
  if(ampm==="PM"&&h!==12)h+=12;
  if(ampm==="AM"&&h===12)h=0;
- let total=h*60+min-30;
- if(total<0)total+=1440;
+ let total=h*60+min-30;if(total<0)total+=1440;
  h=Math.floor(total/60)%24;min=total%60;
- const outAmpm=h>=12?"PM":"AM";
- let outH=h%12;if(outH===0)outH=12;
+ const outAmpm=h>=12?"PM":"AM";let outH=h%12;if(outH===0)outH=12;
  return outH+":"+String(min).padStart(2,"0")+" "+outAmpm;
 }
 function arrivalFor(e){return e.arrival||defaultArrival(e.start)}
-const today=new Date();today.setHours(0,0,0,0);
-const upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+function validClock(t){return /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(t||"")}
+function parseClock(t){
+ const m=t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);if(!m)return null;
+ let h=+m[1],min=+m[2],ap=m[3].toUpperCase();
+ if(ap==="PM"&&h!==12)h+=12;if(ap==="AM"&&h===12)h=0;
+ return {h,min};
+}
+function icsStamp(date,time,addDay=false){
+ const [y,m,d]=date.split("-").map(Number),c=parseClock(time);if(!c)return "";
+ const dt=new Date(y,m-1,d+(addDay?1:0),c.h,c.min);
+ return String(dt.getFullYear())+String(dt.getMonth()+1).padStart(2,"0")+String(dt.getDate()).padStart(2,"0")+"T"+String(dt.getHours()).padStart(2,"0")+String(dt.getMinutes()).padStart(2,"0")+"00";
+}
+function icsEscape(s){return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;")}
+function downloadICS(e){
+ if(!validClock(e.start))return;
+ const sc=parseClock(e.start),ec=validClock(e.end)?parseClock(e.end):null;
+ let end=e.end,addDay=false;
+ if(!ec){end=e.start}else{const sm=sc.h*60+sc.min,em=ec.h*60+ec.min;addDay=em<=sm}
+ const body=[
+  "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//BandSync Portal//BPE//EN","BEGIN:VEVENT",
+  "DTSTART;TZID=America/New_York:"+icsStamp(e.date,e.start,false),
+  "DTEND;TZID=America/New_York:"+icsStamp(e.date,end,addDay),
+  "SUMMARY:"+icsEscape("BPE @ "+e.venue),
+  "LOCATION:"+icsEscape(e.location),
+  "DESCRIPTION:"+icsEscape((e.notes||"")+(arrivalFor(e)?" Arrival: "+arrivalFor(e):"")),
+  "END:VEVENT","END:VCALENDAR"
+ ].join("\r\n");
+ const blob=new Blob([body],{type:"text/calendar;charset=utf-8"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="BPE-"+e.date+"-"+e.venue.replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"")+".ics";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function renderRecentUpdates(){
  const el=document.getElementById("recentUpdates");
  el.innerHTML=recentUpdates.slice(0,5).map(u=>'<div class="update'+(u.alert?' alert':'')+'"><div class="dot"></div><div><b>'+u.title+'</b><span>'+u.text+'</span></div></div>').join('');
@@ -184,7 +186,8 @@ function renderNext(){
  const e=upcoming[0],el=document.getElementById("nextGig");
  if(!e){el.innerHTML='<div class="empty">No upcoming gigs currently listed.</div>';return}
  const d=parseDate(e.date);
- el.innerHTML='<div class="eyebrow">'+(e.recurring?'Recurring Gig':'Upcoming Gig')+'</div><div class="next-name">'+e.venue+'</div><div class="sub">'+fmtDay(d)+' • '+e.start+(e.end&&e.end!=="TBD"?'–'+e.end:'')+'</div><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Performance</span></div><div class="info"><b>'+e.status+'</b><span>Status</span></div></div>'+(e.location?'<div class="actions"><a class="btn" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Get Directions</a></div>':'');
+ el.innerHTML='<div class="eyebrow">'+(e.recurring?'Recurring Gig':'Upcoming Gig')+'</div><div class="next-name">'+e.venue+'</div><div class="sub">'+fmtDay(d)+' • '+e.start+(e.end&&e.end!=="TBD"?'–'+e.end:'')+'</div><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Performance</span></div><div class="info"><b>'+e.status+'</b><span>Status</span></div></div><div class="actions">'+(e.location?'<a class="btn" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Get Directions</a>':'')+(validClock(e.start)?'<button class="btn secondary" type="button" data-cal="next">Add to Calendar</button>':'')+'</div>';
+ const btn=el.querySelector('[data-cal="next"]');if(btn)btn.addEventListener("click",()=>downloadICS(e));
 }
 function renderWeek(){
  const end=new Date(today);end.setDate(today.getDate()+6);
@@ -199,20 +202,58 @@ function renderCurrentFlyers(){
  if(!current.length){root.innerHTML='<div class="card"><div class="empty">No flyers currently posted for '+label.textContent+'.</div></div>';return}
  root.innerHTML=current.map(e=>'<div class="flyer-card"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"><div class="copy"><b>'+fmtDay(parseDate(e.date))+' • '+e.venue+'</b><span>'+(e.notes?e.notes.split(".")[0]:"Event flyer")+'</span></div></div>').join('');
 }
+function eventCard(e,archiveMode=false){
+ const d=parseDate(e.date),sameDay=e.date==="2026-12-06";
+ return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(sameDay&&!archiveMode?'<div class="flag">⚠ Same-day double booking currently listed on December 6.</div>':'')+(arrivalFor(e)?'<div class="important-detail"><span>Arrival Time</span><b>'+arrivalFor(e)+'</b></div>':'')+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.attire?'<p><b>Attire:</b> '+e.attire+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.flyer?'<div class="flyer-label">Event Flyer</div><div class="flyer-thumb"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></div>':'')+'<div class="actions">'+(e.location?'<a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open in Maps</a>':'')+(validClock(e.start)?'<button class="btn secondary add-cal" type="button" data-date="'+e.date+'" data-venue="'+encodeURIComponent(e.venue)+'">Add to Calendar</button>':'')+'</div></div></details>';
+}
+function bindCalendarButtons(root){
+ root.querySelectorAll(".add-cal").forEach(btn=>btn.addEventListener("click",()=>{
+  const venue=decodeURIComponent(btn.dataset.venue),e=events.find(x=>x.date===btn.dataset.date&&x.venue===venue);if(e)downloadICS(e);
+ }));
+}
 function renderSchedule(){
  const q=document.getElementById("search").value.toLowerCase().trim(),sf=document.getElementById("statusFilter").value;
  const filtered=upcoming.filter(e=>(!q||(e.venue+" "+e.location+" "+e.notes).toLowerCase().includes(q))&&(!sf||e.status===sf));
  const grouped={};filtered.forEach(e=>{const k=fmtMonth(parseDate(e.date));(grouped[k]??=[]).push(e)});
  const root=document.getElementById("schedule");
  if(!filtered.length){root.innerHTML='<div class="card"><div class="empty">No matching gigs.</div></div>';return}
- root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h4>'+month+'</h4>'+arr.map(e=>{
-  const d=parseDate(e.date),sameDay=e.date==="2026-12-06";
-  return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(sameDay?'<div class="flag">⚠ Same-day double booking currently listed on December 6.</div>':'')+(arrivalFor(e)?'<div class="important-detail"><span>Arrival Time</span><b>'+arrivalFor(e)+'</b></div>':'')+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.attire?'<p><b>Attire:</b> '+e.attire+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.flyer?'<div class="flyer-label">Event Flyer</div><div class="flyer-thumb"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></div>':'')+(e.location?'<div class="actions"><a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open in Maps</a></div>':'')+'</div></details>'
- }).join('')+'</div>').join('');
+ root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h4>'+month+'</h4>'+arr.map(e=>eventCard(e,false)).join('')+'</div>').join('');
+ bindCalendarButtons(root);
+}
+function renderArchive(){
+ const root=document.getElementById("archive");
+ if(!archived.length){root.innerHTML='<div class="card"><div class="empty">No archived shows yet.</div></div>';return}
+ const grouped={};archived.forEach(e=>{const k=fmtMonth(parseDate(e.date));(grouped[k]??=[]).push(e)});
+ root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h4>'+month+'</h4>'+arr.map(e=>eventCard(e,true)).join('')+'</div>').join('');
+ bindCalendarButtons(root);
+}
+async function loadData(){
+ try{
+  const [er,ur]=await Promise.all([fetch("events.json",{cache:"no-store"}),fetch("updates.json",{cache:"no-store"})]);
+  if(!er.ok||!ur.ok)throw new Error("Data unavailable");
+  events=await er.json();recentUpdates=await ur.json();
+  upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+  archived=events.filter(e=>parseDate(e.date)<today).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
+  renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();renderArchive();
+ }catch(err){
+  document.getElementById("schedule").innerHTML='<div class="card"><div class="empty">Schedule data could not be loaded. Please refresh the page.</div></div>';
+ }
 }
 document.getElementById("search").addEventListener("input",renderSchedule);
 document.getElementById("statusFilter").addEventListener("change",renderSchedule);
-renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();
+document.getElementById("archiveToggle").addEventListener("click",()=>{
+ const root=document.getElementById("archive"),btn=document.getElementById("archiveToggle");
+ root.classList.toggle("open");btn.textContent=root.classList.contains("open")?"Hide Archive":"Show Archive";
+});
+let deferredInstallPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{
+ e.preventDefault();deferredInstallPrompt=e;document.getElementById("installBar").style.display="block";
+});
+document.getElementById("installBtn").addEventListener("click",async()=>{
+ if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;document.getElementById("installBar").style.display="none";
+});
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js"));
+loadData();
 </script>
 </body>
 </html>
