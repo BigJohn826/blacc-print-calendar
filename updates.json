@@ -1,5 +1,9 @@
 [
   {
+    "title": "Nov. 12 — Piano Keys added",
+    "text": "Piano Keys has been added to the schedule for Thursday, November 12. Performance time and location are still pending."
+  },
+  {
     "title": "Nov. 16 — Arrival time added",
     "text": "BPE must arrive no later than 6:45 PM for Asia’s Surprise Birthday Party.",
     "alert": true
@@ -16,9 +20,5 @@
   {
     "title": "Nov. 27 — Performance time updated",
     "text": "BPE now performs at 11:45 PM at Mojito’s Bar and Grill for the Black Friday Party."
-  },
-  {
-    "title": "Nov. 16 — Party details updated",
-    "text": "Doors open at 6:30 PM, party starts at 7:00 PM, and BPE performs at 9:00 PM. Close out the first set with the Birthday Song."
   }
 ]
