@@ -1,5 +1,9 @@
 [
   {
+    "title": "Nov. 12 — Piano Keys time added",
+    "text": "BPE performance at Piano Keys is now listed for 9:00 PM. Arrival time defaults to 8:30 PM."
+  },
+  {
     "title": "Nov. 12 — Piano Keys added",
     "text": "Piano Keys has been added to the schedule for Thursday, November 12. Performance time and location are still pending."
   },
@@ -16,9 +20,5 @@
   {
     "title": "Takoma Station — Times updated",
     "text": "Remaining Takoma Station shows are now scheduled for 7:30 PM–10:00 PM."
-  },
-  {
-    "title": "Nov. 27 — Performance time updated",
-    "text": "BPE now performs at 11:45 PM at Mojito’s Bar and Grill for the Black Friday Party."
   }
 ]
