@@ -1,0 +1,277 @@
+[
+  {
+    "date": "2026-10-30",
+    "start": "10:00 PM",
+    "end": "12:00 AM",
+    "venue": "Lake Presidential Golf Club",
+    "location": "3151 Presidential Golf Dr, Upper Marlboro, MD",
+    "status": "Confirmed",
+    "notes": "All Black Scorpio Bash presented by Eye on the City Entertainment. BPE performance time: 10 PM. Flyer lists overall event hours as 8 PM–12 AM.",
+    "recurring": false,
+    "flyer": "assets/lake-presidential-oct-30-2026.jpg"
+  },
+  {
+    "date": "2026-10-31",
+    "start": "10:00 PM",
+    "end": "1:00 AM",
+    "venue": "DoubleTree by Hilton",
+    "location": "300 Army Navy Dr, Arlington, VA 22202",
+    "status": "Confirmed",
+    "attire": "Black BPE polo and black pants",
+    "notes": "Costume Masquerade Ball. Flyer hours: 8 PM–1 AM. BPE performance block: 10 PM–1 AM.",
+    "recurring": false,
+    "flyer": "assets/doubletree-oct-31-2026.jpg"
+  },
+  {
+    "date": "2026-11-01",
+    "start": "6:00 PM",
+    "end": "10:00 PM",
+    "venue": "Shark Bar",
+    "location": "2056 Crain Highway, Waldorf, MD 20601",
+    "status": "Confirmed",
+    "attire": "Blue BPE polo",
+    "notes": "Archie’s Grateful for My Journey Birthday Party. Flyer lists event hours as 6 PM–10 PM and features Blacc Print Experience. If BPE has a separate hit time, update this entry when confirmed.",
+    "recurring": false,
+    "flyer": "assets/shark-bar-nov-1-2026.jpg"
+  },
+  {
+    "date": "2026-11-07",
+    "start": "7:00 PM",
+    "end": "12:00 AM",
+    "venue": "St. Luke’s Center",
+    "location": "4923 East Capitol Street SE, Washington, DC",
+    "status": "Confirmed",
+    "notes": "Archie & Archie All Out Crank — Scorpio Take Over featuring Blacc Print Experience and DJ Pumpin Archie. Flyer event hours: 7 PM–12 AM.",
+    "recurring": false,
+    "flyer": "assets/st-lukes-nov-7-2026.jpg"
+  },
+  {
+    "date": "2026-11-08",
+    "start": "8:00 PM",
+    "end": "11:00 PM",
+    "venue": "LISP",
+    "location": "",
+    "status": "Confirmed",
+    "notes": "Recurring BPE date. Location details will be added when confirmed.",
+    "recurring": true
+  },
+  {
+    "date": "2026-11-13",
+    "start": "7:30 PM",
+    "end": "10:00 PM",
+    "venue": "Takoma Station",
+    "location": "6914 4th St NW, Washington, DC 20012",
+    "status": "Confirmed",
+    "notes": "",
+    "recurring": true
+  },
+  {
+    "date": "2026-11-14",
+    "start": "10:30 PM",
+    "end": "11:30 PM",
+    "venue": "Diablos Cantina — MGM National Harbor",
+    "location": "101 MGM National Ave, Oxon Hill, MD 20745",
+    "status": "Confirmed",
+    "notes": "The Scene Edition — Celebrating Scorpio Season. Flyer event hours: 9 PM–2 AM. Live performances by Push Play ft. D. Floyd and Blacc Print. BPE performance time remains 10:30–11:30 PM.",
+    "recurring": false,
+    "flyer": "assets/mgm-nov-14-2026.jpg"
+  },
+  {
+    "date": "2026-11-16",
+    "start": "9:00 PM",
+    "end": "TBD",
+    "venue": "Asia’s Surprise Birthday Party",
+    "location": "Fort Washington, MD",
+    "status": "Needs Details",
+    "arrival": "No later than 6:45 PM",
+    "notes": "Surprise party for Asia’s boyfriend. Doors open at 6:30 PM; party starts at 7:00 PM; BPE performs at 9:00 PM. Close out first set with the Birthday Song. Exact address pending.",
+    "recurring": false
+  },
+  {
+    "date": "2026-11-21",
+    "start": "5:00 PM",
+    "end": "9:00 PM",
+    "venue": "House Of Soul",
+    "location": "House Of Soul",
+    "status": "Confirmed",
+    "notes": "All Black Party.",
+    "recurring": false
+  },
+  {
+    "date": "2026-11-27",
+    "start": "11:45 PM",
+    "end": "1:45 AM",
+    "venue": "Mojito’s Bar and Grill",
+    "location": "8035 Snouffer School Rd, Gaithersburg, MD",
+    "status": "Confirmed",
+    "notes": "Black Friday Party featuring Blacc Print Experience and a guest band TBA. Doors/event hours: 9 PM–1:45 AM. BPE performance starts at 11:45 PM.",
+    "recurring": false
+  },
+  {
+    "date": "2026-11-27",
+    "start": "7:30 PM",
+    "end": "10:00 PM",
+    "venue": "Takoma Station",
+    "location": "6914 4th St NW, Washington, DC 20012",
+    "status": "Confirmed",
+    "notes": "",
+    "recurring": true
+  },
+  {
+    "date": "2026-11-29",
+    "start": "6:00 PM",
+    "end": "10:00 PM",
+    "venue": "Encore",
+    "location": "",
+    "status": "Needs Details",
+    "notes": "Exact venue address pending.",
+    "recurring": false
+  },
+  {
+    "date": "2026-12-05",
+    "start": "8:00 PM",
+    "end": "11:00 PM",
+    "venue": "Private Party",
+    "location": "",
+    "status": "Needs Details",
+    "notes": "Exact venue and performance time not provided. Time shown is a placeholder.",
+    "recurring": false
+  },
+  {
+    "date": "2026-12-06",
+    "start": "5:00 PM",
+    "end": "8:00 PM",
+    "venue": "Ezzytime Game Day Experience",
+    "location": "3611 Stewart Rd, Forestville, MD",
+    "status": "Confirmed",
+    "notes": "Ultimate Game Day Tailgate & Watch Party. Tailgate starts 10 AM; moves inside 12:30 PM. BPE at halftime and after the game.",
+    "recurring": false,
+    "flyer": "assets/ezzytime-dec-6-2026.jpg"
+  },
+  {
+    "date": "2026-12-06",
+    "start": "8:00 PM",
+    "end": "11:00 PM",
+    "venue": "Shark Bar",
+    "location": "2056 Crain Hwy, Waldorf, MD 20601",
+    "status": "Confirmed",
+    "notes": "Same-day schedule: follows the Ezzytime event currently listed 5–8 PM.",
+    "recurring": true
+  },
+  {
+    "date": "2026-12-11",
+    "start": "7:30 PM",
+    "end": "10:00 PM",
+    "venue": "Takoma Station",
+    "location": "6914 4th St NW, Washington, DC 20012",
+    "status": "Confirmed",
+    "notes": "",
+    "recurring": true
+  },
+  {
+    "date": "2026-12-12",
+    "start": "9:00 PM",
+    "end": "12:00 AM",
+    "venue": "Eloquent Touch Ballroom",
+    "location": "3914 Bexley Place, Hillcrest Heights, MD 20746",
+    "status": "Confirmed",
+    "notes": "Season of Hope Holiday Fundraiser Gala. Flyer event hours: 8 PM–midnight.",
+    "recurring": false,
+    "flyer": "assets/season-of-hope-dec-12-2026.jpg"
+  },
+  {
+    "date": "2026-12-13",
+    "start": "8:00 PM",
+    "end": "11:00 PM",
+    "venue": "LISP",
+    "location": "",
+    "status": "Confirmed",
+    "notes": "Recurring BPE date. Location details will be added when confirmed.",
+    "recurring": true
+  },
+  {
+    "date": "2026-12-25",
+    "start": "7:30 PM",
+    "end": "10:00 PM",
+    "venue": "Takoma Station",
+    "location": "6914 4th St NW, Washington, DC 20012",
+    "status": "Confirmed",
+    "notes": "",
+    "recurring": true
+  },
+  {
+    "date": "2027-01-01",
+    "start": "TBD",
+    "end": "TBD",
+    "venue": "Hamilton Hotel",
+    "location": "1001 14th Street NW, Washington, DC",
+    "status": "Needs Details",
+    "notes": "New Year's Day show featuring Push Play, Sirius Company, and Blacc Print. Performance time pending.",
+    "recurring": false,
+    "flyer": "assets/hamilton-jan-1-2027.jpg"
+  },
+  {
+    "date": "2027-01-15",
+    "start": "Trip Hold",
+    "end": "Jan 18",
+    "venue": "Lakeview Resort",
+    "location": "Lakeview Resort",
+    "status": "Needs Details",
+    "notes": "EzzyTime Winter Ride 27 — MLK Weekend, Jan 15–18. Features Blacc Print Experience and multiple DJs. Performance day/time TBD.",
+    "recurring": false,
+    "flyer": "assets/winter-ride-jan-15-18-2027.jpg"
+  },
+  {
+    "date": "2027-02-20",
+    "start": "9:00 PM",
+    "end": "12:00 AM",
+    "venue": "Seven Springs Mountain Resort",
+    "location": "777 Waterwheel Drive, Champion, PA 15622",
+    "status": "Confirmed",
+    "notes": "PJ’s Legacy Ski Trip runs Feb 19–21. Saturday All Black Party featuring Blacc Print Experience with DJ SupaDan. BPE performance block remains 9 PM–12 AM.",
+    "recurring": false,
+    "flyer": "assets/seven-springs-feb-19-21-2027.jpg"
+  },
+  {
+    "date": "2027-05-08",
+    "start": "TBD",
+    "end": "TBD",
+    "venue": "Diamond Lounge",
+    "location": "Virginia",
+    "status": "Needs Details",
+    "notes": "BPE with Push Play. Performance time and exact address pending.",
+    "recurring": false
+  },
+  {
+    "date": "2027-08-14",
+    "start": "TBD",
+    "end": "TBD",
+    "venue": "We R One — Kenny's Birthday with Rare Essence",
+    "location": "",
+    "status": "Needs Details",
+    "notes": "Save the date. Venue and performance time pending.",
+    "recurring": false
+  },
+  {
+    "date": "2027-08-28",
+    "start": "3:00 PM",
+    "end": "TBD",
+    "venue": "Funk Fest Virginia Beach Pool Party",
+    "location": "1075 General Booth Blvd, Virginia Beach, VA",
+    "status": "Confirmed",
+    "notes": "Transparent Entertainment presents Funk Fest Virginia Beach Pool Party. Featuring Blacc Print Experience. Event starts at 3 PM; exact BPE performance time pending.",
+    "recurring": false,
+    "flyer": "assets/virginia-beach-aug-28-2027.jpg"
+  },
+  {
+    "date": "2027-09-16",
+    "start": "Trip Hold",
+    "end": "Sep 19",
+    "venue": "Hilton Head National RV Resort",
+    "location": "36 Hilton Head National Drive, Bluffton, SC 29910",
+    "status": "Needs Details",
+    "notes": "Hilton Head Music Fest and Pool Party, Sep 16–19. Featuring Blacc Print Experience, The Back In The Day Band, Nothing But A Feeling, and Regina Belle. Performance day/time TBD.",
+    "recurring": false,
+    "flyer": "assets/hilton-head-sep-16-19-2027.jpg"
+  }
+]
