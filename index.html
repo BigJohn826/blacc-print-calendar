@@ -156,6 +156,21 @@ function fmtMonth(d){return d.toLocaleDateString("en-US",{month:"long",year:"num
 function fmtDay(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
 function mapsUrl(loc){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc)}
 function statusClass(s){return s==="Confirmed"?"confirmed":s==="Canceled"?"pending":"pending"}
+function defaultArrival(start){
+ if(!start||start==="TBD"||start==="Trip Hold"||start==="Canceled")return "";
+ const m=start.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+ if(!m)return "";
+ let h=parseInt(m[1],10),min=parseInt(m[2],10),ampm=m[3].toUpperCase();
+ if(ampm==="PM"&&h!==12)h+=12;
+ if(ampm==="AM"&&h===12)h=0;
+ let total=h*60+min-30;
+ if(total<0)total+=1440;
+ h=Math.floor(total/60)%24;min=total%60;
+ const outAmpm=h>=12?"PM":"AM";
+ let outH=h%12;if(outH===0)outH=12;
+ return outH+":"+String(min).padStart(2,"0")+" "+outAmpm;
+}
+function arrivalFor(e){return e.arrival||defaultArrival(e.start)}
 const today=new Date();today.setHours(0,0,0,0);
 const upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
 function renderNext(){
@@ -185,7 +200,7 @@ function renderSchedule(){
  if(!filtered.length){root.innerHTML='<div class="card"><div class="empty">No matching gigs.</div></div>';return}
  root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h4>'+month+'</h4>'+arr.map(e=>{
   const d=parseDate(e.date),sameDay=e.date==="2026-12-06";
-  return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(sameDay?'<div class="flag">⚠ Same-day double booking currently listed on December 6.</div>':'')+(e.arrival?'<div class="important-detail"><span>Arrival Time</span><b>'+e.arrival+'</b></div>':'')+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.attire?'<p><b>Attire:</b> '+e.attire+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.flyer?'<div class="flyer-label">Event Flyer</div><div class="flyer-thumb"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></div>':'')+(e.location?'<div class="actions"><a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open in Maps</a></div>':'')+'</div></details>'
+  return '<details class="gig"><summary><div class="datebox"><strong>'+d.getDate()+'</strong><span>'+d.toLocaleDateString("en-US",{weekday:"short"})+'</span></div><div class="gigmain"><b>'+e.venue+'</b><span>'+e.start+(e.recurring?' • Recurring':'')+'</span></div><span class="badge '+statusClass(e.status)+'">'+e.status+'</span></summary><div class="details"><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Start</span></div><div class="info"><b>'+(e.end||'TBD')+'</b><span>End</span></div></div>'+(sameDay?'<div class="flag">⚠ Same-day double booking currently listed on December 6.</div>':'')+(arrivalFor(e)?'<div class="important-detail"><span>Arrival Time</span><b>'+arrivalFor(e)+'</b></div>':'')+(e.location?'<p><b>Location:</b> '+e.location+'</p>':'')+(e.attire?'<p><b>Attire:</b> '+e.attire+'</p>':'')+(e.notes?'<p>'+e.notes+'</p>':'')+(e.flyer?'<div class="flyer-label">Event Flyer</div><div class="flyer-thumb"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></div>':'')+(e.location?'<div class="actions"><a class="btn secondary" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Open in Maps</a></div>':'')+'</div></details>'
  }).join('')+'</div>').join('');
 }
 document.getElementById("search").addEventListener("input",renderSchedule);
