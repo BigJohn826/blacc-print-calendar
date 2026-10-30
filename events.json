@@ -56,6 +56,16 @@
     "recurring": true
   },
   {
+    "date": "2026-11-12",
+    "start": "TBD",
+    "end": "TBD",
+    "venue": "Piano Keys",
+    "location": "",
+    "status": "Needs Details",
+    "notes": "Save the date. Performance time and location details pending.",
+    "recurring": false
+  },
+  {
     "date": "2026-11-13",
     "start": "7:30 PM",
     "end": "10:00 PM",
