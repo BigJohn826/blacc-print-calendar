@@ -1,5 +1,9 @@
 [
   {
+    "title": "Shark Bar — Start time standardized",
+    "text": "Shark Bar shows are now listed with a 7:30 PM performance start. Arrival defaults to 7:00 PM unless a different arrival time is provided."
+  },
+  {
     "title": "Nov. 12 — Piano Keys details updated",
     "text": "Piano Keys is now listed at 7651 Matapeake Business Dr, Brandywine, MD. First set is 8:00 PM; arrival defaults to 7:30 PM."
   },
@@ -14,11 +18,6 @@
   {
     "title": "Nov. 16 — Arrival time added",
     "text": "BPE must arrive no later than 6:45 PM for Asia’s Surprise Birthday Party.",
-    "alert": true
-  },
-  {
-    "title": "Nov. 28 — Show removed",
-    "text": "The Hampton Conference Center / Season of the Sagittarius show has been canceled and removed from the schedule.",
     "alert": true
   }
 ]
