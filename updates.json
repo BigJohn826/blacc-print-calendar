@@ -1,5 +1,9 @@
 [
   {
+    "title": "Nov. 12 — Piano Keys details updated",
+    "text": "Piano Keys is now listed at 7651 Matapeake Business Dr, Brandywine, MD. First set is 8:00 PM; arrival defaults to 7:30 PM."
+  },
+  {
     "title": "Nov. 12 — Piano Keys time added",
     "text": "BPE performance at Piano Keys is now listed for 9:00 PM. Arrival time defaults to 8:30 PM."
   },
@@ -16,9 +20,5 @@
     "title": "Nov. 28 — Show removed",
     "text": "The Hampton Conference Center / Season of the Sagittarius show has been canceled and removed from the schedule.",
     "alert": true
-  },
-  {
-    "title": "Takoma Station — Times updated",
-    "text": "Remaining Takoma Station shows are now scheduled for 7:30 PM–10:00 PM."
   }
 ]
