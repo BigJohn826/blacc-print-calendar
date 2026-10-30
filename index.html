@@ -95,13 +95,9 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
     <p>Performance dates, times, locations, flyers, and important schedule changes.</p>
   </section>
 
-  <div class="section-title"><h3>Recent Updates</h3><span>Important changes first</span></div>
+  <div class="section-title"><h3>Recent Updates</h3><span>Latest important changes</span></div>
   <div class="card">
-    <div class="update-list">
-      <div class="update"><div class="dot"></div><div><b>Upcoming schedule loaded</b><span>Dates through September 2027 are now on the portal. Tap any date for details and directions.</span></div></div>
-      <div class="update alert"><div class="dot"></div><div><b>December 6 has two BPE events</b><span>Ezzytime Game Day Experience is scheduled 5–8 PM, followed by Shark Bar 8–11 PM. Keep an eye here for any timing adjustment.</span></div></div>
-      <div class="update"><div class="dot"></div><div><b>Events marked “Needs Details” are placeholders</b><span>As addresses, dress codes, and exact performance times come in, they will be updated here.</span></div></div>
-    </div>
+    <div class="update-list" id="recentUpdates"></div>
   </div>
 
   <div class="section-title"><h3>Next Gig</h3><span>Up next</span></div>
@@ -123,6 +119,13 @@ footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1
   <footer>Blacc Print Experience • Mobile Calendar Portal<br>Save this page to your phone for quick access.</footer>
 </div>
 <script>
+const recentUpdates=[
+  {title:"Nov. 16 — Arrival time added",text:"BPE must arrive no later than 6:45 PM for Asia’s Surprise Birthday Party.",alert:true},
+  {title:"Nov. 28 — Show removed",text:"The Hampton Conference Center / Season of the Sagittarius show has been canceled and removed from the schedule.",alert:true},
+  {title:"Takoma Station — Times updated",text:"Remaining Takoma Station shows are now scheduled for 7:30 PM–10:00 PM."},
+  {title:"Nov. 27 — Performance time updated",text:"BPE now performs at 11:45 PM at Mojito’s Bar and Grill for the Black Friday Party."},
+  {title:"Nov. 16 — Party details updated",text:"Doors open at 6:30 PM, party starts at 7:00 PM, and BPE performs at 9:00 PM. Close out the first set with the Birthday Song."}
+];
 const events=[
 {date:"2026-10-30",start:"10:00 PM",end:"12:00 AM",venue:"Lake Presidential Golf Club",location:"3151 Presidential Golf Dr, Upper Marlboro, MD",status:"Confirmed",notes:"All Black Scorpio Bash presented by Eye on the City Entertainment. BPE performance time: 10 PM. Flyer lists overall event hours as 8 PM–12 AM.",recurring:false,flyer:"assets/lake-presidential-oct-30-2026.jpg"},
 {date:"2026-10-31",start:"10:00 PM",end:"1:00 AM",venue:"DoubleTree by Hilton",location:"300 Army Navy Dr, Arlington, VA 22202",status:"Confirmed",attire:"Black BPE polo and black pants",notes:"Costume Masquerade Ball. Flyer hours: 8 PM–1 AM. BPE performance block: 10 PM–1 AM.",recurring:false,flyer:"assets/doubletree-oct-31-2026.jpg"},
@@ -173,6 +176,10 @@ function defaultArrival(start){
 function arrivalFor(e){return e.arrival||defaultArrival(e.start)}
 const today=new Date();today.setHours(0,0,0,0);
 const upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+function renderRecentUpdates(){
+ const el=document.getElementById("recentUpdates");
+ el.innerHTML=recentUpdates.slice(0,5).map(u=>'<div class="update'+(u.alert?' alert':'')+'"><div class="dot"></div><div><b>'+u.title+'</b><span>'+u.text+'</span></div></div>').join('');
+}
 function renderNext(){
  const e=upcoming[0],el=document.getElementById("nextGig");
  if(!e){el.innerHTML='<div class="empty">No upcoming gigs currently listed.</div>';return}
@@ -205,7 +212,7 @@ function renderSchedule(){
 }
 document.getElementById("search").addEventListener("input",renderSchedule);
 document.getElementById("statusFilter").addEventListener("change",renderSchedule);
-renderNext();renderWeek();renderCurrentFlyers();renderSchedule();
+renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();
 </script>
 </body>
 </html>
