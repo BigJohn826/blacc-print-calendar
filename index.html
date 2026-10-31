@@ -79,6 +79,7 @@ input:focus,select:focus{border-color:#555562}
 .flyer-grid{display:grid;grid-template-columns:minmax(0,190px);gap:12px}.flyer-card a{display:block;cursor:zoom-in}.flyer-card a:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.flyer-card img{transition:opacity .15s}.flyer-card a:hover img{opacity:.85}.flyer-card{background:#111116;border:1px solid #292930;border-radius:18px;overflow:hidden}.flyer-card img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#050505}.flyer-card .copy{padding:11px}.flyer-card b{font-size:12px;display:block}.flyer-card span{font-size:10px;color:var(--muted);display:block;margin-top:3px}.flyer-thumb{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid #2e2e35;background:#09090c}.flyer-thumb img{display:block;width:100%;max-height:620px;object-fit:contain}.flyer-label{font-size:9px;color:var(--red2);font-weight:900;text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px}
 .install-bar{display:none;margin:12px 0 0}.utility-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0}.utility-row .btn{flex:0 0 auto}.notice{font-size:10px;color:var(--muted);margin-top:8px}.archive-wrap{margin-top:22px}.archive-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.archive-head h3{font-size:19px;margin:0}.archive-list{display:none}.archive-list.open{display:block}.mini-btn{appearance:none;border:1px solid #303039;background:#17171c;color:#fff;border-radius:11px;padding:9px 12px;font-size:11px;font-weight:850}footer{text-align:center;color:#666;font-size:10px;margin-top:28px;line-height:1.5}
 @media(max-width:520px){.toolbar{grid-template-columns:1fr}.next-name{font-size:24px}.hero h2{font-size:26px}}
+.flyer-open{border:0;padding:0;background:none;width:100%;cursor:zoom-in}.flyer-open:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.flyer-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.94);display:none;flex-direction:column;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}.flyer-modal.open{display:flex}.flyer-modal-bar{width:min(100%,820px);display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.flyer-modal-bar strong{font-size:13px}.flyer-close{background:var(--red);color:#fff;border:0;border-radius:12px;font-size:15px;font-weight:850;padding:12px 18px;min-height:46px;cursor:pointer}.flyer-modal img{max-width:100%;max-height:calc(100dvh - 115px);width:auto;height:auto;object-fit:contain;min-height:0}.flyer-modal[aria-hidden="true"]{display:none}body.flyer-viewing{overflow:hidden}
 </style>
 </head>
 <body>
@@ -125,6 +126,10 @@ input:focus,select:focus{border-color:#555562}
 
   <div class="archive-wrap"><div class="archive-head"><h3>Past Shows</h3><button class="mini-btn" id="archiveToggle" type="button">Show Archive</button></div><div class="archive-list" id="archive"></div></div>
 
+  <div class="flyer-modal" id="flyerModal" role="dialog" aria-modal="true" aria-label="Full-size event flyer" aria-hidden="true">
+    <div class="flyer-modal-bar"><strong>Event Flyer</strong><button class="flyer-close" id="flyerClose" type="button">✕ Close / Back to Portal</button></div>
+    <img id="flyerFull" src="" alt="Full-size event flyer">
+  </div>
   <footer>Blacc Print Experience • Mobile Calendar Portal<br>Save this page to your phone for quick access.</footer>
 </div>
 <script>
@@ -198,13 +203,35 @@ function renderWeek(){
  const list=upcoming.filter(e=>parseDate(e.date)<=end),el=document.getElementById("thisWeek");
  el.innerHTML=list.length?list.map(e=>'<div class="week-item"><div><div class="when">'+fmtDay(parseDate(e.date))+'</div><b>'+e.venue+'</b></div><div class="time">'+e.start+'</div></div>').join(''):'<div class="card"><div class="empty">No BPE gigs in the next 7 days.</div></div>';
 }
+let flyerReturnFocus=null;
+function openFlyer(src,venue){
+ flyerReturnFocus=document.activeElement;
+ document.getElementById("flyerFull").src=src;
+ document.getElementById("flyerFull").alt=venue+" full-size flyer";
+ const modal=document.getElementById("flyerModal");
+ modal.classList.add("open");modal.setAttribute("aria-hidden","false");
+ document.body.classList.add("flyer-viewing");
+ document.getElementById("flyerClose").focus();
+}
+function closeFlyer(){
+ const modal=document.getElementById("flyerModal");
+ if(!modal.classList.contains("open"))return;
+ modal.classList.remove("open");modal.setAttribute("aria-hidden","true");
+ document.body.classList.remove("flyer-viewing");
+ document.getElementById("flyerFull").removeAttribute("src");
+ if(flyerReturnFocus&&flyerReturnFocus.isConnected)flyerReturnFocus.focus();
+}
+document.getElementById("flyerClose").addEventListener("click",closeFlyer);
+document.getElementById("flyerModal").addEventListener("click",e=>{if(e.target.id==="flyerModal")closeFlyer()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeFlyer()});
 function renderCurrentFlyers(){
  const root=document.getElementById("currentFlyers"),label=document.getElementById("flyerMonthLabel");
  const e=upcoming[0];
  label.textContent=e?fmtDay(parseDate(e.date)):"No upcoming gigs";
  if(!e){root.innerHTML='<div class="card"><div class="empty">No upcoming gig flyer to display.</div></div>';return}
  if(!e.flyer){root.innerHTML='<div class="card"><div class="empty">No flyer posted yet for '+e.venue+'.</div></div>';return}
- root.innerHTML='<div class="flyer-card"><a href="'+e.flyer+'" target="_blank" rel="noopener" aria-label="Open full flyer for '+e.venue+'"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></a><div class="copy"><b>'+fmtDay(parseDate(e.date))+' • '+e.venue+'</b><span>Tap flyer to view full size</span></div></div>';
+ root.innerHTML='<div class="flyer-card"><button class="flyer-open" type="button" aria-label="View full flyer for '+e.venue+'"><img src="'+e.flyer+'" alt="'+e.venue+' event flyer"></button><div class="copy"><b>'+fmtDay(parseDate(e.date))+' • '+e.venue+'</b><span>Tap flyer to view full size</span></div></div>';
+ root.querySelector(".flyer-open").addEventListener("click",()=>openFlyer(e.flyer,e.venue));
 }
 function eventCard(e,archiveMode=false){
  const d=parseDate(e.date),sameDay=e.date==="2026-12-06";
