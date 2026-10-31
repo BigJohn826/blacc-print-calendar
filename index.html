@@ -344,13 +344,35 @@ async function registerPushSubscription(OneSignal){
  try{
   const id=OneSignal.User.PushSubscription.id;
   if(!id||!OneSignal.User.PushSubscription.optedIn)return false;
-  const r=await fetch(PUSH_REGISTER_URL,{
+
+  let memberName=localStorage.getItem("bpeMemberName")||"";
+  const sendRegistration=async(name)=>fetch(PUSH_REGISTER_URL,{
    method:"POST",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({subscription_id:id}),
+   body:JSON.stringify({subscription_id:id,member_name:name||undefined}),
    cache:"no-store"
   });
-  return r.ok;
+
+  let r=await sendRegistration(memberName);
+  if(!r.ok)return false;
+  let data=await r.json().catch(()=>({}));
+
+  if(!memberName&&data.member_name){
+   memberName=data.member_name;
+   localStorage.setItem("bpeMemberName",memberName);
+  }
+
+  if(!memberName){
+   const entered=(window.prompt("Who is using this device? Enter the band member name.")||"").trim();
+   if(entered){
+    memberName=entered;
+    localStorage.setItem("bpeMemberName",memberName);
+    r=await sendRegistration(memberName);
+    if(!r.ok)return false;
+   }
+  }
+
+  return true;
  }catch(e){
   console.error("Push subscription registration error",e);
   return false;
