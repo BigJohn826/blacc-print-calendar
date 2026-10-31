@@ -73,7 +73,10 @@
     "location": "6914 4th St NW, Washington, DC 20012",
     "status": "Confirmed",
     "notes": "",
-    "recurring": true
+    "recurring": true,
+    "unavailable": [
+      "John"
+    ]
   },
   {
     "date": "2026-11-14",
@@ -84,7 +87,10 @@
     "status": "Confirmed",
     "notes": "The Scene Edition — Celebrating Scorpio Season. Flyer event hours: 9 PM–2 AM. Live performances by Push Play ft. D. Floyd and Blacc Print. BPE performance time remains 10:30–11:30 PM.",
     "recurring": false,
-    "flyer": "assets/mgm-nov-14-2026.jpg"
+    "flyer": "assets/mgm-nov-14-2026.jpg",
+    "unavailable": [
+      "John"
+    ]
   },
   {
     "date": "2026-11-16",
