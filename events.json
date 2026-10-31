@@ -43,7 +43,10 @@
     "status": "Confirmed",
     "notes": "Archie & Archie All Out Crank — Scorpio Take Over featuring Blacc Print Experience and DJ Pumpin Archie. Flyer event hours: 7 PM–12 AM.",
     "recurring": false,
-    "flyer": "assets/st-lukes-nov-7-2026.jpg"
+    "flyer": "assets/st-lukes-nov-7-2026.jpg",
+    "unavailable": [
+      "Herb"
+    ]
   },
   {
     "date": "2026-11-08",
@@ -53,7 +56,10 @@
     "location": "",
     "status": "Confirmed",
     "notes": "Recurring BPE date. Location details will be added when confirmed.",
-    "recurring": true
+    "recurring": true,
+    "unavailable": [
+      "Herb"
+    ]
   },
   {
     "date": "2026-11-12",
