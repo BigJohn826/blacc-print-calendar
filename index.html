@@ -115,7 +115,7 @@ window.OneSignalDeferred.push(async function(OneSignal) {
   </section>
 
   <div class="install-bar" id="installBar"><button class="btn secondary" id="installBtn" type="button">Install Portal</button></div>
-  <div class="utility-row"><button class="btn secondary" id="refreshBtn" type="button">↻ Refresh</button><button class="btn secondary" id="shareBtn" type="button">Share Portal</button><button class="btn secondary" id="copyBtn" type="button">Copy Link</button><a class="btn secondary" href="mailto:music4lifebeats@gmail.com?subject=BPE%20Portal%20Update&body=Date%3A%0AVenue%3A%0APerformance%20Time%3A%0AArrival%20Time%20(if%20different%20from%2030%20minutes%20prior)%3A%0ALocation%3A%0AAttire%3A%0ANotes%3A" id="updateRequest">Submit Update</a></div>
+  <div class="utility-row"><button class="btn secondary" id="notifyBtn" type="button">Enable Notifications</button><button class="btn secondary" id="refreshBtn" type="button">↻ Refresh</button><button class="btn secondary" id="shareBtn" type="button">Share Portal</button><button class="btn secondary" id="copyBtn" type="button">Copy Link</button><a class="btn secondary" href="mailto:music4lifebeats@gmail.com?subject=BPE%20Portal%20Update&body=Date%3A%0AVenue%3A%0APerformance%20Time%3A%0AArrival%20Time%20(if%20different%20from%2030%20minutes%20prior)%3A%0ALocation%3A%0AAttire%3A%0ANotes%3A" id="updateRequest">Submit Update</a></div>
 
   <div class="section-title"><h3>Recent Updates</h3><span>Latest important changes</span></div>
   <div class="card">
@@ -312,6 +312,20 @@ document.getElementById("shareBtn").addEventListener("click",async()=>{
  if(navigator.share){try{await navigator.share(data)}catch(e){}}
  else{await navigator.clipboard.writeText(location.href);document.getElementById("shareBtn").textContent="Link Copied";setTimeout(()=>document.getElementById("shareBtn").textContent="Share Portal",1800)}
 });
+document.getElementById("notifyBtn").addEventListener("click",async()=>{
+ try{
+  if(!window.OneSignalDeferred){alert("Notifications are still loading. Please try again.");return;}
+  window.OneSignalDeferred.push(async function(OneSignal){
+   try{
+    await OneSignal.Notifications.requestPermission();
+    const btn=document.getElementById("notifyBtn");
+    if(Notification.permission==="granted") btn.textContent="Notifications Enabled";
+    else if(Notification.permission==="denied") btn.textContent="Notifications Blocked";
+   }catch(e){alert("Could not enable notifications on this device.");}
+  });
+ }catch(e){alert("Could not enable notifications on this device.");}
+});
+
 document.getElementById("copyBtn").addEventListener("click",async()=>{
  try{await navigator.clipboard.writeText(location.href);const b=document.getElementById("copyBtn");b.textContent="Copied";setTimeout(()=>b.textContent="Copy Link",1500)}catch(e){}
 });
