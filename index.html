@@ -390,44 +390,51 @@ async function chooseBandMember(){
  });
 }
 
+let pushRegistrationPromise=null;
 async function registerPushSubscription(OneSignal){
- try{
-  const id=OneSignal.User.PushSubscription.id;
-  if(!id||!OneSignal.User.PushSubscription.optedIn)return false;
+ if(pushRegistrationPromise)return pushRegistrationPromise;
+ pushRegistrationPromise=(async()=>{
+  try{
+   const id=OneSignal.User.PushSubscription.id;
+   if(!id||!OneSignal.User.PushSubscription.optedIn)return false;
 
-  let memberId=localStorage.getItem("bpeMemberId")||"";
-  const sendRegistration=async(mid)=>fetch(PUSH_REGISTER_URL,{
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({subscription_id:id,member_id:mid||undefined}),
-   cache:"no-store"
-  });
+   let memberId=localStorage.getItem("bpeMemberId")||"";
+   const sendRegistration=async(mid)=>fetch(PUSH_REGISTER_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({subscription_id:id,member_id:mid||undefined}),
+    cache:"no-store"
+   });
 
-  let r=await sendRegistration(memberId);
-  if(!r.ok)return false;
-  let data=await r.json().catch(()=>({}));
-
-  if(!memberId&&data.member_id){
-   memberId=data.member_id;
-   localStorage.setItem("bpeMemberId",memberId);
-   if(data.member_name)localStorage.setItem("bpeMemberName",data.member_name);
-  }
-
-  if(!memberId){
-   const member=await chooseBandMember();
-   if(!member)return false;
-   memberId=member.id;
-   localStorage.setItem("bpeMemberId",member.id);
-   localStorage.setItem("bpeMemberName",member.name);
-   r=await sendRegistration(member.id);
+   let r=await sendRegistration(memberId);
    if(!r.ok)return false;
-  }
+   let data=await r.json().catch(()=>({}));
 
-  return true;
- }catch(e){
-  console.error("Push subscription registration error",e);
-  return false;
- }
+   if(!memberId&&data.member_id){
+    memberId=data.member_id;
+    localStorage.setItem("bpeMemberId",memberId);
+    if(data.member_name)localStorage.setItem("bpeMemberName",data.member_name);
+   }
+
+   if(!memberId){
+    const member=await chooseBandMember();
+    if(!member)return false;
+    memberId=member.id;
+    localStorage.setItem("bpeMemberId",member.id);
+    localStorage.setItem("bpeMemberName",member.name);
+    r=await sendRegistration(member.id);
+    if(!r.ok)return false;
+   }
+
+   return true;
+  }catch(e){
+   console.error("Push subscription registration error",e);
+   return false;
+  }finally{
+   setTimeout(()=>{pushRegistrationPromise=null},0);
+  }
+ })();
+ return pushRegistrationPromise;
 }
 function setNotificationButtonState(OneSignal){
  const btn=document.getElementById("notifyBtn");
