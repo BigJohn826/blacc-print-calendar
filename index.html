@@ -82,6 +82,19 @@ input:focus,select:focus{border-color:#555562}
 @media(max-width:520px){.toolbar{grid-template-columns:1fr}.next-name{font-size:24px}.hero h2{font-size:26px}}
 .flyer-open{border:0;padding:0;background:none;width:100%;cursor:zoom-in}.flyer-open:focus-visible{outline:2px solid var(--amber);outline-offset:3px}.flyer-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.94);display:none;flex-direction:column;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom))}.flyer-modal.open{display:flex}.flyer-modal-bar{width:min(100%,820px);display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.flyer-modal-bar strong{font-size:13px}.flyer-close{background:var(--red);color:#fff;border:0;border-radius:12px;font-size:15px;font-weight:850;padding:12px 18px;min-height:46px;cursor:pointer}.flyer-modal img{max-width:100%;max-height:calc(100dvh - 115px);width:auto;height:auto;object-fit:contain;min-height:0}.flyer-modal[aria-hidden="true"]{display:none}body.flyer-viewing{overflow:hidden}
 </style>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({
+    appId: "fccbd4e5-2ab1-4250-8052-27e8754bbdc8",
+    safari_web_id: "web.onesignal.auto.0f4ef0fc-d020-4184-9066-253532c318fc",
+    serviceWorkerPath: "service-worker.js",
+    serviceWorkerParam: { scope: "/blacc-print-calendar/" },
+    notifyButton: { enable: true }
+  });
+});
+</script>
 </head>
 <body>
 <div class="wrap">
