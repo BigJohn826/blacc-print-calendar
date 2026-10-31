@@ -89,7 +89,7 @@ window.OneSignalDeferred.push(async function(OneSignal) {
   await OneSignal.init({
     appId: "fccbd4e5-2ab1-4250-8052-27e8754bbdc8",
     safari_web_id: "web.onesignal.auto.0f4ef0fc-d020-4184-9066-253532c318fc",
-    serviceWorkerPath: "service-worker.js",
+    serviceWorkerPath: "blacc-print-calendar/service-worker.js",
     serviceWorkerParam: { scope: "/blacc-print-calendar/" },
     notifyButton: { enable: true }
   });
@@ -313,17 +313,30 @@ document.getElementById("shareBtn").addEventListener("click",async()=>{
  else{await navigator.clipboard.writeText(location.href);document.getElementById("shareBtn").textContent="Link Copied";setTimeout(()=>document.getElementById("shareBtn").textContent="Share Portal",1800)}
 });
 document.getElementById("notifyBtn").addEventListener("click",async()=>{
+ const btn=document.getElementById("notifyBtn");
+ btn.disabled=true;btn.textContent="Checking Notifications…";
  try{
-  if(!window.OneSignalDeferred){alert("Notifications are still loading. Please try again.");return;}
+  window.OneSignalDeferred=window.OneSignalDeferred||[];
   window.OneSignalDeferred.push(async function(OneSignal){
    try{
+    if(!OneSignal.Notifications.isPushSupported()){
+     btn.textContent="Open from Home Screen";btn.disabled=false;return;
+    }
+    if(OneSignal.Notifications.permission){
+     btn.textContent="Notifications Enabled";btn.disabled=false;return;
+    }
     await OneSignal.Notifications.requestPermission();
-    const btn=document.getElementById("notifyBtn");
-    if(Notification.permission==="granted") btn.textContent="Notifications Enabled";
-    else if(Notification.permission==="denied") btn.textContent="Notifications Blocked";
-   }catch(e){alert("Could not enable notifications on this device.");}
+    btn.textContent=OneSignal.Notifications.permission?"Notifications Enabled":"Enable Notifications";
+    btn.disabled=false;
+   }catch(e){
+    console.error("OneSignal permission error",e);
+    btn.textContent="Try Notifications Again";btn.disabled=false;
+   }
   });
- }catch(e){alert("Could not enable notifications on this device.");}
+ }catch(e){
+  console.error("OneSignal button error",e);
+  btn.textContent="Try Notifications Again";btn.disabled=false;
+ }
 });
 
 document.getElementById("copyBtn").addEventListener("click",async()=>{
