@@ -1,5 +1,10 @@
 [
   {
+    "title": "Nov. 13–14 — Member availability",
+    "text": "John is unavailable for all BPE shows on November 13 and November 14.",
+    "alert": true
+  },
+  {
     "title": "Shark Bar — Start time standardized",
     "text": "Shark Bar shows are now listed with a 7:30 PM performance start. Arrival defaults to 7:00 PM unless a different arrival time is provided."
   },
@@ -14,10 +19,5 @@
   {
     "title": "Nov. 12 — Piano Keys added",
     "text": "Piano Keys has been added to the schedule for Thursday, November 12. Performance time and location are still pending."
-  },
-  {
-    "title": "Nov. 16 — Arrival time added",
-    "text": "BPE must arrive no later than 6:45 PM for Asia’s Surprise Birthday Party.",
-    "alert": true
   }
 ]
