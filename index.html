@@ -283,21 +283,13 @@ function renderArchive(){
 }
 async function loadData(){
  try{
-  const r=await fetch("https://rnqhltkpocodvybovlss.supabase.co/functions/v1/bpe-portal-data",{cache:"no-store"});
-  if(!r.ok)throw new Error("Data unavailable");
-  const payload=await r.json();
-  events=(payload.gigs||[]).map(g=>({
-   id:g.id,date:g.event_date,start:g.start_time,end:g.end_time,venue:g.venue,
-   location:g.location||"",status:g.status||"Needs Details",arrival:g.arrival_time||"",
-   attire:g.attire||"",notes:g.notes||"",recurring:!!g.recurring,flyer:g.flyer_url||""
-  }));
-  recentUpdates=(payload.updates||[]).map(u=>({title:u.title,text:u.body,alert:!!u.alert}));
-  availability=(payload.availability||[]).map(a=>({member:a.member_name,start:a.start_date,end:a.end_date,notes:a.notes||""}));
+  const [er,ur,ar]=await Promise.all([fetch("events.json",{cache:"no-store"}),fetch("updates.json",{cache:"no-store"}),fetch("availability.json",{cache:"no-store"})]);
+  if(!er.ok||!ur.ok||!ar.ok)throw new Error("Data unavailable");
+  events=await er.json();recentUpdates=await ur.json();availability=await ar.json();
   upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
   archived=events.filter(e=>parseDate(e.date)<today).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
   renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();renderArchive();
  }catch(err){
-  console.error("Supabase load error",err);
   document.getElementById("schedule").innerHTML='<div class="card"><div class="empty">Schedule data could not be loaded. Please refresh the page.</div></div>';
  }
 }
