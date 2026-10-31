@@ -8,7 +8,7 @@
   "theme_color": "#07111d",
   "icons": [
     {
-      "src": "assets/bandsync-primary.png",
+      "src": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/a794e8f22b5bfc5bccb374a858e18a5e80b8fb2cc6609b5f07d03051a39f864b.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any maskable"
