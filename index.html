@@ -339,6 +339,49 @@ document.getElementById("shareBtn").addEventListener("click",async()=>{
  if(navigator.share){try{await navigator.share(data)}catch(e){}}
  else{await navigator.clipboard.writeText(location.href);document.getElementById("shareBtn").textContent="Link Copied";setTimeout(()=>document.getElementById("shareBtn").textContent="Share Portal",1800)}
 });
+function setNotificationButtonState(OneSignal){
+ const btn=document.getElementById("notifyBtn");
+ if(!btn)return;
+ try{
+  if(!OneSignal.Notifications.isPushSupported()){
+   btn.textContent="Open from Home Screen";btn.disabled=false;return false;
+  }
+  const optedIn=!!OneSignal.User.PushSubscription.optedIn;
+  const subscriptionId=OneSignal.User.PushSubscription.id;
+  const token=OneSignal.User.PushSubscription.token;
+  if(OneSignal.Notifications.permission&&optedIn&&subscriptionId&&token){
+   btn.textContent="Notifications Enabled";btn.disabled=false;return true;
+  }
+  btn.textContent=OneSignal.Notifications.permission?"Finish Notifications Setup":"Enable Notifications";
+  btn.disabled=false;return false;
+ }catch(e){
+  console.error("OneSignal state check error",e);
+  btn.textContent="Enable Notifications";btn.disabled=false;return false;
+ }
+}
+async function ensureOneSignalSubscription(OneSignal){
+ if(!OneSignal.Notifications.isPushSupported())return false;
+ if(!OneSignal.Notifications.permission){
+  await OneSignal.Notifications.requestPermission();
+ }
+ if(!OneSignal.Notifications.permission)return false;
+ await OneSignal.User.PushSubscription.optIn();
+ for(let i=0;i<10;i++){
+  if(setNotificationButtonState(OneSignal))return true;
+  await new Promise(r=>setTimeout(r,500));
+ }
+ return setNotificationButtonState(OneSignal);
+}
+window.OneSignalDeferred=window.OneSignalDeferred||[];
+window.OneSignalDeferred.push(async function(OneSignal){
+ try{
+  setNotificationButtonState(OneSignal);
+  OneSignal.User.PushSubscription.addEventListener("change",()=>setNotificationButtonState(OneSignal));
+  if(OneSignal.Notifications.permission&&!OneSignal.User.PushSubscription.id){
+   await ensureOneSignalSubscription(OneSignal);
+  }
+ }catch(e){console.error("OneSignal startup sync error",e)}
+});
 document.getElementById("notifyBtn").addEventListener("click",async()=>{
  const btn=document.getElementById("notifyBtn");
  btn.disabled=true;btn.textContent="Checking Notifications…";
@@ -346,21 +389,8 @@ document.getElementById("notifyBtn").addEventListener("click",async()=>{
   window.OneSignalDeferred=window.OneSignalDeferred||[];
   window.OneSignalDeferred.push(async function(OneSignal){
    try{
-    if(!OneSignal.Notifications.isPushSupported()){
-     btn.textContent="Open from Home Screen";btn.disabled=false;return;
-    }
-    if(!OneSignal.Notifications.permission){
-     await OneSignal.Notifications.requestPermission();
-    }
-    if(OneSignal.Notifications.permission){
-     await OneSignal.User.PushSubscription.optIn();
-     const optedIn=OneSignal.User.PushSubscription.optedIn;
-     const subscriptionId=OneSignal.User.PushSubscription.id;
-     btn.textContent=(optedIn&&subscriptionId)?"Notifications Enabled":"Finish Notifications Setup";
-    }else{
-     btn.textContent="Enable Notifications";
-    }
-    btn.disabled=false;
+    const active=await ensureOneSignalSubscription(OneSignal);
+    if(!active&&OneSignal.Notifications.permission)btn.textContent="Finish Notifications Setup";
    }catch(e){
     console.error("OneSignal subscription error",e);
     btn.textContent="Try Notifications Again";btn.disabled=false;
