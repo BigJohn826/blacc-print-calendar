@@ -44,6 +44,8 @@ a{color:inherit}
 .alert{border-color:rgba(244,197,106,.35);background:linear-gradient(180deg,rgba(244,197,106,.08),rgba(18,18,22,.96))}
 .alert .dot{background:var(--amber);box-shadow:0 0 0 4px rgba(244,197,106,.11)}
 .next{border-left:4px solid var(--red);padding-left:14px}
+.next-essentials{margin-top:11px;padding:9px 11px;background:rgba(244,197,106,.07);border:1px solid rgba(244,197,106,.26);border-radius:11px;font-size:12px;line-height:1.55}
+.next-essentials .essential-label{color:var(--amber);font-weight:900;margin-right:6px}.next-essentials .essential-value{color:var(--text);font-weight:750}.next-essentials .essential-row+.essential-row{margin-top:3px}
 .eyebrow{font-size:10px;letter-spacing:1.4px;color:var(--red2);text-transform:uppercase;font-weight:900}
 .next-name{font-size:27px;font-weight:950;margin:5px 0 2px;letter-spacing:-.6px}
 .sub{color:var(--muted);font-size:12px;line-height:1.45}
@@ -186,8 +188,9 @@ function renderRecentUpdates(){
 function renderNext(){
  const e=upcoming[0],el=document.getElementById("nextGig");
  if(!e){el.innerHTML='<div class="empty">No upcoming gigs currently listed.</div>';return}
- const d=parseDate(e.date);
- el.innerHTML='<div class="eyebrow">'+(e.recurring?'Recurring Gig':'Upcoming Gig')+'</div><div class="next-name">'+e.venue+'</div><div class="sub">'+fmtDay(d)+' • '+e.start+(e.end&&e.end!=="TBD"?'–'+e.end:'')+'</div><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Performance</span></div><div class="info"><b>'+e.status+'</b><span>Status</span></div></div><div class="actions">'+(e.location?'<a class="btn" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Get Directions</a>':'')+(validClock(e.start)?'<button class="btn secondary" type="button" data-cal="next">Add to Calendar</button>':'')+'</div>';
+ const d=parseDate(e.date),arrival=arrivalFor(e);
+ const essentials=(arrival?'<div class="essential-row"><span class="essential-label">ARRIVE</span><span class="essential-value">'+arrival+'</span></div>':'')+(e.attire?'<div class="essential-row"><span class="essential-label">ATTIRE</span><span class="essential-value">'+e.attire+'</span></div>':'');
+ el.innerHTML='<div class="eyebrow">'+(e.recurring?'Recurring Gig':'Upcoming Gig')+'</div><div class="next-name">'+e.venue+'</div><div class="sub">'+fmtDay(d)+' • '+e.start+(e.end&&e.end!=="TBD"?'–'+e.end:'')+'</div><div class="info-grid"><div class="info"><b>'+e.start+'</b><span>Performance</span></div><div class="info"><b>'+e.status+'</b><span>Status</span></div></div>'+(essentials?'<div class="next-essentials">'+essentials+'</div>':'')+(e.unavailable&&e.unavailable.length?'<div class="availability-alert"><span>⚠ Member Availability</span><b>'+e.unavailable.join(', ')+' — unavailable</b></div>':'')+'<div class="actions">'+(e.location?'<a class="btn" href="'+mapsUrl(e.location)+'" target="_blank" rel="noopener">Get Directions</a>':'')+(validClock(e.start)?'<button class="btn secondary" type="button" data-cal="next">Add to Calendar</button>':'')+'</div>';
  const btn=el.querySelector('[data-cal="next"]');if(btn)btn.addEventListener("click",()=>downloadICS(e));
 }
 function renderWeek(){
