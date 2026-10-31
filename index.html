@@ -102,7 +102,7 @@ input:focus,select:focus{border-color:#555562}
   </section>
 
   <div class="install-bar" id="installBar"><button class="btn secondary" id="installBtn" type="button">Install Portal</button></div>
-  <div class="utility-row"><button class="btn secondary" id="shareBtn" type="button">Share Portal</button><button class="btn secondary" id="copyBtn" type="button">Copy Link</button><a class="btn secondary" href="mailto:music4lifebeats@gmail.com?subject=BPE%20Portal%20Update&body=Date%3A%0AVenue%3A%0APerformance%20Time%3A%0AArrival%20Time%20(if%20different%20from%2030%20minutes%20prior)%3A%0ALocation%3A%0AAttire%3A%0ANotes%3A" id="updateRequest">Submit Update</a></div>
+  <div class="utility-row"><button class="btn secondary" id="refreshBtn" type="button">↻ Refresh</button><button class="btn secondary" id="shareBtn" type="button">Share Portal</button><button class="btn secondary" id="copyBtn" type="button">Copy Link</button><a class="btn secondary" href="mailto:music4lifebeats@gmail.com?subject=BPE%20Portal%20Update&body=Date%3A%0AVenue%3A%0APerformance%20Time%3A%0AArrival%20Time%20(if%20different%20from%2030%20minutes%20prior)%3A%0ALocation%3A%0AAttire%3A%0ANotes%3A" id="updateRequest">Submit Update</a></div>
 
   <div class="section-title"><h3>Recent Updates</h3><span>Latest important changes</span></div>
   <div class="card">
@@ -280,7 +280,7 @@ async function loadData(){
   document.getElementById("schedule").innerHTML='<div class="card"><div class="empty">Schedule data could not be loaded. Please refresh the page.</div></div>';
  }
 }
-document.getElementById("search").addEventListener("input",renderSchedule);
+async function refreshPortal(){const btn=document.getElementById("refreshBtn");if(btn){btn.disabled=true;btn.textContent="Refreshing…"}try{if("serviceWorker" in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update()))}}catch(e){}window.location.reload()}document.getElementById("refreshBtn").addEventListener("click",refreshPortal);document.getElementById("search").addEventListener("input",renderSchedule);
 document.getElementById("statusFilter").addEventListener("change",renderSchedule);
 document.getElementById("archiveToggle").addEventListener("click",()=>{
  const root=document.getElementById("archive"),btn=document.getElementById("archiveToggle");
