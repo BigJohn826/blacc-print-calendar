@@ -282,7 +282,9 @@ function renderArchive(){
  bindCalendarButtons(root);
 }
 const SUPABASE_PORTAL_URL="https://rnqhltkpocodvybovlss.supabase.co/functions/v1/bpe-portal-data";
+let bandMembers=[];
 function applyPortalData(source){
+ bandMembers=(source.members||[]).map(m=>({id:m.id,name:m.display_name,role:m.role||""}));
  events=(source.gigs||[]).map(g=>({
   date:g.event_date??g.date,start:g.start_time??g.start,end:g.end_time??g.end,
   venue:g.venue,location:g.location||"",status:g.status||"Needs Details",
@@ -340,36 +342,83 @@ document.getElementById("shareBtn").addEventListener("click",async()=>{
  else{await navigator.clipboard.writeText(location.href);document.getElementById("shareBtn").textContent="Link Copied";setTimeout(()=>document.getElementById("shareBtn").textContent="Share Portal",1800)}
 });
 const PUSH_REGISTER_URL="https://rnqhltkpocodvybovlss.supabase.co/functions/v1/register-bpe-push-subscription";
+
+async function getBandMembers(){
+ if(bandMembers.length)return bandMembers;
+ try{
+  const r=await fetch(SUPABASE_PORTAL_URL,{cache:"no-store",headers:{"Accept":"application/json"}});
+  if(r.ok){
+   const data=await r.json();
+   bandMembers=(data.members||[]).map(m=>({id:m.id,name:m.display_name,role:m.role||""}));
+  }
+ }catch(e){console.error("Roster load error",e)}
+ return bandMembers;
+}
+
+async function chooseBandMember(){
+ const members=await getBandMembers();
+ if(!members.length)return null;
+ return await new Promise(resolve=>{
+  const overlay=document.createElement("div");
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px";
+  const card=document.createElement("div");
+  card.style.cssText="width:min(92vw,420px);background:#171717;color:#fff;border:1px solid #444;border-radius:16px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.45)";
+  const title=document.createElement("div");
+  title.textContent="Who is using this device?";
+  title.style.cssText="font-size:20px;font-weight:800;margin-bottom:8px";
+  const help=document.createElement("div");
+  help.textContent="Choose your name from the BPE roster. This links this device to you for targeted notifications.";
+  help.style.cssText="font-size:14px;opacity:.8;line-height:1.4;margin-bottom:14px";
+  const select=document.createElement("select");
+  select.style.cssText="width:100%;padding:12px;border-radius:10px;font-size:16px;margin-bottom:14px";
+  select.innerHTML='<option value="">Select your name…</option>'+members.map(m=>'<option value="'+m.id+'">'+m.name+(m.role?' — '+m.role:'')+'</option>').join("");
+  const button=document.createElement("button");
+  button.textContent="Use This Name";
+  button.disabled=true;
+  button.style.cssText="width:100%;padding:12px;border-radius:10px;border:0;font-weight:800;font-size:16px";
+  select.addEventListener("change",()=>{button.disabled=!select.value});
+  button.addEventListener("click",()=>{
+   const member=members.find(m=>m.id===select.value)||null;
+   overlay.remove();
+   resolve(member);
+  });
+  card.append(title,help,select,button);
+  overlay.append(card);
+  document.body.append(overlay);
+ });
+}
+
 async function registerPushSubscription(OneSignal){
  try{
   const id=OneSignal.User.PushSubscription.id;
   if(!id||!OneSignal.User.PushSubscription.optedIn)return false;
 
-  let memberName=localStorage.getItem("bpeMemberName")||"";
-  const sendRegistration=async(name)=>fetch(PUSH_REGISTER_URL,{
+  let memberId=localStorage.getItem("bpeMemberId")||"";
+  const sendRegistration=async(mid)=>fetch(PUSH_REGISTER_URL,{
    method:"POST",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify({subscription_id:id,member_name:name||undefined}),
+   body:JSON.stringify({subscription_id:id,member_id:mid||undefined}),
    cache:"no-store"
   });
 
-  let r=await sendRegistration(memberName);
+  let r=await sendRegistration(memberId);
   if(!r.ok)return false;
   let data=await r.json().catch(()=>({}));
 
-  if(!memberName&&data.member_name){
-   memberName=data.member_name;
-   localStorage.setItem("bpeMemberName",memberName);
+  if(!memberId&&data.member_id){
+   memberId=data.member_id;
+   localStorage.setItem("bpeMemberId",memberId);
+   if(data.member_name)localStorage.setItem("bpeMemberName",data.member_name);
   }
 
-  if(!memberName){
-   const entered=(window.prompt("Who is using this device? Enter the band member name.")||"").trim();
-   if(entered){
-    memberName=entered;
-    localStorage.setItem("bpeMemberName",memberName);
-    r=await sendRegistration(memberName);
-    if(!r.ok)return false;
-   }
+  if(!memberId){
+   const member=await chooseBandMember();
+   if(!member)return false;
+   memberId=member.id;
+   localStorage.setItem("bpeMemberId",member.id);
+   localStorage.setItem("bpeMemberName",member.name);
+   r=await sendRegistration(member.id);
+   if(!r.ok)return false;
   }
 
   return true;
