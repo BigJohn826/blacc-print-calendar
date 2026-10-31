@@ -339,6 +339,23 @@ document.getElementById("shareBtn").addEventListener("click",async()=>{
  if(navigator.share){try{await navigator.share(data)}catch(e){}}
  else{await navigator.clipboard.writeText(location.href);document.getElementById("shareBtn").textContent="Link Copied";setTimeout(()=>document.getElementById("shareBtn").textContent="Share Portal",1800)}
 });
+const PUSH_REGISTER_URL="https://rnqhltkpocodvybovlss.supabase.co/functions/v1/register-bpe-push-subscription";
+async function registerPushSubscription(OneSignal){
+ try{
+  const id=OneSignal.User.PushSubscription.id;
+  if(!id||!OneSignal.User.PushSubscription.optedIn)return false;
+  const r=await fetch(PUSH_REGISTER_URL,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({subscription_id:id}),
+   cache:"no-store"
+  });
+  return r.ok;
+ }catch(e){
+  console.error("Push subscription registration error",e);
+  return false;
+ }
+}
 function setNotificationButtonState(OneSignal){
  const btn=document.getElementById("notifyBtn");
  if(!btn)return;
@@ -350,6 +367,7 @@ function setNotificationButtonState(OneSignal){
   const subscriptionId=OneSignal.User.PushSubscription.id;
   const token=OneSignal.User.PushSubscription.token;
   if(OneSignal.Notifications.permission&&optedIn&&subscriptionId&&token){
+   registerPushSubscription(OneSignal);
    btn.textContent="Notifications Enabled";btn.disabled=false;return true;
   }
   btn.textContent=OneSignal.Notifications.permission?"Finish Notifications Setup":"Enable Notifications";
@@ -376,7 +394,8 @@ window.OneSignalDeferred=window.OneSignalDeferred||[];
 window.OneSignalDeferred.push(async function(OneSignal){
  try{
   setNotificationButtonState(OneSignal);
-  OneSignal.User.PushSubscription.addEventListener("change",()=>setNotificationButtonState(OneSignal));
+  if(OneSignal.User.PushSubscription.id&&OneSignal.User.PushSubscription.optedIn)await registerPushSubscription(OneSignal);
+  OneSignal.User.PushSubscription.addEventListener("change",async()=>{setNotificationButtonState(OneSignal);await registerPushSubscription(OneSignal)});
   if(OneSignal.Notifications.permission&&!OneSignal.User.PushSubscription.id){
    await ensureOneSignalSubscription(OneSignal);
   }
