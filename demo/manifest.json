@@ -1,0 +1,17 @@
+{
+  "name": "BandSync Demo Portal",
+  "short_name": "BandSync Demo",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#05080d",
+  "theme_color": "#07111d",
+  "icons": [
+    {
+      "src": "assets/bandsync-primary.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
