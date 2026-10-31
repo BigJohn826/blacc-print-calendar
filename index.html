@@ -474,21 +474,45 @@ window.OneSignalDeferred.push(async function(OneSignal){
   }
  }catch(e){console.error("OneSignal startup sync error",e)}
 });
+function isIOSDevice(){
+ return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+}
+function isStandalonePortal(){
+ return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+}
 document.getElementById("notifyBtn").addEventListener("click",async()=>{
  const btn=document.getElementById("notifyBtn");
+ if(isIOSDevice()&&!isStandalonePortal()){
+  btn.textContent="Open from Home Screen";
+  btn.disabled=false;
+  alert("On iPhone and iPad, BPE push notifications should be enabled from the installed BPE Portal on your Home Screen. Open the BPE icon, then tap Enable Notifications there.");
+  return;
+ }
  btn.disabled=true;btn.textContent="Checking Notifications…";
+ const fallback=setTimeout(()=>{
+  if(btn.textContent==="Checking Notifications…"){
+   btn.textContent="Try Notifications Again";
+   btn.disabled=false;
+  }
+ },8000);
  try{
   window.OneSignalDeferred=window.OneSignalDeferred||[];
   window.OneSignalDeferred.push(async function(OneSignal){
    try{
     const active=await ensureOneSignalSubscription(OneSignal);
-    if(!active&&OneSignal.Notifications.permission)btn.textContent="Finish Notifications Setup";
+    clearTimeout(fallback);
+    if(!active){
+     btn.textContent=OneSignal.Notifications.permission?"Finish Notifications Setup":"Enable Notifications";
+     btn.disabled=false;
+    }
    }catch(e){
+    clearTimeout(fallback);
     console.error("OneSignal subscription error",e);
     btn.textContent="Try Notifications Again";btn.disabled=false;
    }
   });
  }catch(e){
+  clearTimeout(fallback);
   console.error("OneSignal button error",e);
   btn.textContent="Try Notifications Again";btn.disabled=false;
  }
