@@ -104,7 +104,7 @@ window.OneSignalDeferred.push(async function(OneSignal) {
       <div>
         <h1>Blacc Print Experience</h1>
         <p>Calendar Portal</p>
-        <div class="last-updated">Last updated: October 30, 2026</div>
+        <div class="last-updated">Last updated: October 31, 2026</div>
       </div>
     </div>
   </div>
@@ -281,16 +281,43 @@ function renderArchive(){
  root.innerHTML=Object.entries(grouped).map(([month,arr])=>'<div class="month"><h4>'+month+'</h4>'+arr.map(e=>eventCard(e,true)).join('')+'</div>').join('');
  bindCalendarButtons(root);
 }
+const SUPABASE_PORTAL_URL="https://rnqhltkpocodvybovlss.supabase.co/functions/v1/bpe-portal-data";
+function applyPortalData(source){
+ events=(source.gigs||[]).map(g=>({
+  date:g.event_date??g.date,start:g.start_time??g.start,end:g.end_time??g.end,
+  venue:g.venue,location:g.location||"",status:g.status||"Needs Details",
+  arrival:g.arrival_time??g.arrival??"",attire:g.attire||"",notes:g.notes||"",
+  recurring:!!g.recurring,flyer:g.flyer_url??g.flyer??null,unavailable:g.unavailable||[]
+ }));
+ recentUpdates=(source.updates||[]).map(u=>({
+  title:u.title,text:u.body??u.text??"",alert:!!u.alert
+ }));
+ availability=(source.availability||[]).map(a=>({
+  member:a.member_name??a.member,start:a.start_date??a.start,end:a.end_date??a.end,notes:a.notes||""
+ }));
+ if(!events.length)throw new Error("No gig data returned");
+ upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+ archived=events.filter(e=>parseDate(e.date)<today).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
+ renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();renderArchive();
+}
+async function loadJsonFallback(){
+ const [er,ur,ar]=await Promise.all([fetch("events.json",{cache:"no-store"}),fetch("updates.json",{cache:"no-store"}),fetch("availability.json",{cache:"no-store"})]);
+ if(!er.ok||!ur.ok||!ar.ok)throw new Error("Fallback data unavailable");
+ return {gigs:await er.json(),updates:await ur.json(),availability:await ar.json()};
+}
 async function loadData(){
  try{
-  const [er,ur,ar]=await Promise.all([fetch("events.json",{cache:"no-store"}),fetch("updates.json",{cache:"no-store"}),fetch("availability.json",{cache:"no-store"})]);
-  if(!er.ok||!ur.ok||!ar.ok)throw new Error("Data unavailable");
-  events=await er.json();recentUpdates=await ur.json();availability=await ar.json();
-  upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
-  archived=events.filter(e=>parseDate(e.date)<today).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
-  renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();renderArchive();
- }catch(err){
-  document.getElementById("schedule").innerHTML='<div class="card"><div class="empty">Schedule data could not be loaded. Please refresh the page.</div></div>';
+  const res=await fetch(SUPABASE_PORTAL_URL,{cache:"no-store",headers:{"Accept":"application/json"}});
+  if(!res.ok)throw new Error("Supabase portal data unavailable: "+res.status);
+  applyPortalData(await res.json());
+ }catch(supabaseError){
+  console.warn("Supabase unavailable; using JSON fallback",supabaseError);
+  try{
+   applyPortalData(await loadJsonFallback());
+  }catch(fallbackError){
+   console.error("All portal data sources failed",fallbackError);
+   document.getElementById("schedule").innerHTML='<div class="card"><div class="empty">Schedule data could not be loaded. Please refresh the page.</div></div>';
+  }
  }
 }
 async function refreshPortal(){const btn=document.getElementById("refreshBtn");if(btn){btn.disabled=true;btn.textContent="Refreshing…"}try{if("serviceWorker" in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update()))}}catch(e){}window.location.reload()}document.getElementById("refreshBtn").addEventListener("click",refreshPortal);document.getElementById("search").addEventListener("input",renderSchedule);
