@@ -12,13 +12,13 @@
   },
   {
     "date": "2026-10-31",
-    "start": "10:00 PM",
-    "end": "1:00 AM",
+    "start": "10:15 PM",
+    "end": "11:00 PM",
     "venue": "DoubleTree by Hilton",
     "location": "300 Army Navy Dr, Arlington, VA 22202",
     "status": "Confirmed",
     "attire": "Black BPE button-up shirts, black bottoms, and black shoes",
-    "notes": "Costume Masquerade Ball. Flyer hours: 8 PM–1 AM. BPE performance block: 10 PM–1 AM.",
+    "notes": "Costume Masquerade Ball. Flyer hours: 8 PM–1 AM. BPE performance time: 10:15 PM–11:00 PM (per show schedule flyer).",
     "recurring": false,
     "flyer": "assets/doubletree-oct-31-2026.jpg",
     "arrival": "9:15 PM"
