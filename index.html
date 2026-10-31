@@ -349,14 +349,20 @@ document.getElementById("notifyBtn").addEventListener("click",async()=>{
     if(!OneSignal.Notifications.isPushSupported()){
      btn.textContent="Open from Home Screen";btn.disabled=false;return;
     }
-    if(OneSignal.Notifications.permission){
-     btn.textContent="Notifications Enabled";btn.disabled=false;return;
+    if(!OneSignal.Notifications.permission){
+     await OneSignal.Notifications.requestPermission();
     }
-    await OneSignal.Notifications.requestPermission();
-    btn.textContent=OneSignal.Notifications.permission?"Notifications Enabled":"Enable Notifications";
+    if(OneSignal.Notifications.permission){
+     await OneSignal.User.PushSubscription.optIn();
+     const optedIn=OneSignal.User.PushSubscription.optedIn;
+     const subscriptionId=OneSignal.User.PushSubscription.id;
+     btn.textContent=(optedIn&&subscriptionId)?"Notifications Enabled":"Finish Notifications Setup";
+    }else{
+     btn.textContent="Enable Notifications";
+    }
     btn.disabled=false;
    }catch(e){
-    console.error("OneSignal permission error",e);
+    console.error("OneSignal subscription error",e);
     btn.textContent="Try Notifications Again";btn.disabled=false;
    }
   });
