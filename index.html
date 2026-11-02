@@ -304,24 +304,21 @@ function applyPortalData(source){
  archived=events.filter(e=>parseDate(e.date)<today).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
  renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();renderArchive();
 }
-async function loadJsonFallback(){
- const [er,ur,ar]=await Promise.all([fetch("events.json",{cache:"no-store"}),fetch("updates.json",{cache:"no-store"}),fetch("availability.json",{cache:"no-store"})]);
- if(!er.ok||!ur.ok||!ar.ok)throw new Error("Fallback data unavailable");
- return {gigs:await er.json(),updates:await ur.json(),availability:await ar.json()};
-}
+// Supabase is the only live source of gig, availability and update data.
+// Do not use repository JSON files as a fallback: they can be outdated.
 async function loadData(){
  try{
   const res=await fetch(SUPABASE_PORTAL_URL,{cache:"no-store",headers:{"Accept":"application/json"}});
   if(!res.ok)throw new Error("Supabase portal data unavailable: "+res.status);
   applyPortalData(await res.json());
- }catch(supabaseError){
-  console.warn("Supabase unavailable; using JSON fallback",supabaseError);
-  try{
-   applyPortalData(await loadJsonFallback());
-  }catch(fallbackError){
-   console.error("All portal data sources failed",fallbackError);
-   document.getElementById("schedule").innerHTML='<div class="card"><div class="empty">Schedule data could not be loaded. Please refresh the page.</div></div>';
-  }
+ }catch(err){
+  console.error("BandSync live data unavailable",err);
+  const message='<div class="card"><div class="empty">Live schedule information is temporarily unavailable. Please tap Refresh to try again. Previously published information may be out of date.</div></div>';
+  document.getElementById("schedule").innerHTML=message;
+  document.getElementById("nextGig").innerHTML=message;
+  document.getElementById("thisWeek").innerHTML=message;
+  document.getElementById("currentFlyers").innerHTML=message;
+  document.getElementById("recentUpdates").innerHTML=message;
  }
 }
 async function refreshPortal(){const btn=document.getElementById("refreshBtn");if(btn){btn.disabled=true;btn.textContent="Refreshing…"}try{if("serviceWorker" in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update()))}}catch(e){}window.location.reload()}document.getElementById("refreshBtn").addEventListener("click",refreshPortal);document.getElementById("search").addEventListener("input",renderSchedule);
