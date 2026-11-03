@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BPE · Flyer Manager</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#101017;color:#f5f4fb}
+*{box-sizing:border-box}body{margin:0;padding:20px}main{max-width:720px;margin:24px auto;background:#1b1a26;border:1px solid #454053;border-radius:18px;padding:24px}
+h1{margin:0 0 5px;font-size:1.65rem}h2{font-size:1.15rem}p{line-height:1.5;color:#d4d0df}
+label{display:block;margin:14px 0 7px;font-weight:650}input,select,button{font:inherit;width:100%;border-radius:9px;padding:13px;background:#272636;color:#fff;border:1px solid #696377}
+button{background:#713ba7;border-color:#955fc4;font-weight:750;margin:14px 0 0;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+button.secondary{background:#292637}a{color:#cab0f5}.hint{font-size:.9rem}.hidden{display:none}
+#status{white-space:pre-wrap;margin-top:16px;padding:12px;border-radius:9px;background:#292637;min-height:42px}
+#preview{width:100%;max-height:500px;object-fit:contain;margin-top:15px;border-radius:10px;background:#13131c}
+.small{font-size:.85rem;color:#bbb5cd}
+</style>
+</head>
+<body><main>
+<p><a href="./">← Back to BPE Portal</a></p>
+<h1>Flyer Manager</h1>
+<p>For approved BPE administrators. Add a flyer to an existing gig or replace the current one. Gig dates, times and other details remain unchanged.</p>
+<section id="login">
+<h2>Administrator sign-in</h2>
+<label for="email">Approved email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+<button id="send">Email me a sign-in link</button>
+<p class="hint">Open the link in the same browser. Access is verified against the administrator list; simply choosing a band member's name does not grant access.</p>
+</section>
+<section id="manager" class="hidden">
+<p id="signedIn" class="small"></p><button id="logout" class="secondary">Sign out</button>
+<label for="gig">Choose a show</label><select id="gig"><option value="">Loading gigs…</option></select>
+<p id="showDetails" class="hint"></p>
+<label for="image">Flyer image (JPEG, PNG or WebP; maximum 10 MB)</label>
+<input id="image" type="file" accept="image/jpeg,image/png,image/webp">
+<img id="preview" alt="Selected flyer preview" class="hidden">
+<button id="upload" disabled>Attach flyer to selected show</button>
+<p class="small">A replacement gets a new filename to avoid stale cached flyers. The old file is not automatically deleted.</p>
+</section>
+<div id="status" role="status" aria-live="polite">Sign in to manage flyers.</div>
+</main>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/+esm';
+const endpoint='https://rnqhltkpocodvybovlss.supabase.co';
+const key='sb_publishable_UDefNmZZ9P48SBI4yFYBCg_LQOMr44a';
+const supabase=createClient(endpoint,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=id=>document.getElementById(id);
+const message=s=>$('status').textContent=s;
+const storageBucket='bandsync-flyers';
+let gigs=[],currentFile=null;
+const allowed=new Set(['image/jpeg','image/png','image/webp']);
+function showLogin(){ $('login').classList.remove('hidden');$('manager').classList.add('hidden'); }
+function showManager(user){$('login').classList.add('hidden');$('manager').classList.remove('hidden');$('signedIn').textContent='Signed in: '+user.email;}
+async function refresh(){
+ const {data:{user},error}=await supabase.auth.getUser();
+ if(error||!user){showLogin();return;}
+ const {data:permissions,error:permissionError}=await supabase.from('portal_admin_emails').select('band_slug').eq('band_slug','bpe').eq('email',user.email.toLowerCase());
+ if(permissionError || !permissions?.length){
+  showLogin();message('This account is not approved to manage BPE flyers. Ask the BandSync administrator to authorize it.');return;
+ }
+ showManager(user);
+ const {data,error:gigError}=await supabase.from('gigs').select('id,event_date,venue,start_time,flyer_url').order('event_date',{ascending:true});
+ if(gigError){message('Could not load gigs: '+gigError.message);return;}
+ gigs=data||[];
+ const select=$('gig');select.replaceChildren(new Option('Select a show…',''));
+ for(const g of gigs) select.add(new Option(g.event_date+' · '+g.venue+' · '+g.start_time,g.id));
+ message('Choose an existing show and a flyer image.');
+ updateForm();
+}
+function updateForm(){
+ const show=gigs.find(g=>g.id===$('gig').value);
+ $('showDetails').textContent=show ? ('Current flyer: '+(show.flyer_url?'Attached':'None')+' · '+show.venue+' · '+show.event_date) : '';
+ const current=show?.flyer_url;
+ if(current){const a=document.createElement('a');a.href=current;a.target='_blank';a.rel='noopener noreferrer';a.textContent=' — View existing flyer';$('showDetails').appendChild(a);}
+ $('upload').disabled=!show||!currentFile;
+ $('upload').textContent=show?.flyer_url?'Replace flyer for this show':'Attach flyer to selected show';
+}
+$('gig').addEventListener('change',updateForm);
+$('image').addEventListener('change',()=>{
+ const file=$('image').files?.[0];currentFile=null;
+ $('preview').classList.add('hidden');$('preview').removeAttribute('src');
+ if(!file){updateForm();return;}
+ if(!allowed.has(file.type)||file.size>10*1024*1024){message('Choose a JPEG, PNG or WebP under 10 MB.');updateForm();return;}
+ currentFile=file;
+ $('preview').src=URL.createObjectURL(file);$('preview').classList.remove('hidden');
+ message('Flyer selected. Confirm the correct show before uploading.');updateForm();
+});
+$('send').addEventListener('click',async()=>{
+ const email=$('email').value.trim().toLowerCase();if(!email){message('Enter your approved email address.');return;}
+ $('send').disabled=true;message('Sending sign-in link…');
+ try{
+  const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname,shouldCreateUser:true}});
+  message(error?'Sign-in error: '+error.message:'Check your email for the secure sign-in link. Return here after signing in.');
+ }finally{$('send').disabled=false;}
+});
+$('logout').addEventListener('click',async()=>{await supabase.auth.signOut();currentFile=null;showLogin();message('Signed out.');});
+$('upload').addEventListener('click',async()=>{
+ const gig=gigs.find(g=>g.id===$('gig').value);
+ if(!gig||!currentFile)return;
+ $('upload').disabled=true;
+ const filename='bpe/'+gig.id+'/'+new Date().toISOString().replace(/[:.]/g,'-')+'-'+crypto.randomUUID()+({ 'image/jpeg':'.jpg','image/png':'.png','image/webp':'.webp'}[currentFile.type]);
+ message('Uploading flyer…');
+ try{
+  const {error:uploadError}=await supabase.storage.from(storageBucket).upload(filename,currentFile,{contentType:currentFile.type,upsert:false,cacheControl:'3600'});
+  if(uploadError)throw uploadError;
+  const {data:urlData}=supabase.storage.from(storageBucket).getPublicUrl(filename);
+  const url=urlData.publicUrl;
+  const {data:updated,error:updateError}=await supabase.from('gigs').update({flyer_url:url}).eq('id',gig.id).select('id,flyer_url').single();
+  if(updateError)throw new Error('Image uploaded but database link could not be saved: '+updateError.message);
+  if(updated?.flyer_url!==url)throw new Error('Database verification did not match the uploaded flyer URL.');
+  gig.flyer_url=url;currentFile=null;$('image').value='';
+  message('Flyer saved and verified for '+gig.venue+' on '+gig.event_date+'. Refresh the BPE portal to see it.');
+  updateForm();
+ }catch(e){message('Upload not completed: '+(e?.message||String(e)));}
+ finally{updateForm();}
+});
+supabase.auth.onAuthStateChange(()=>{setTimeout(refresh,0);});
+refresh();
+</script></body></html>
