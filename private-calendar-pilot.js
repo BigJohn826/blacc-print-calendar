@@ -15,7 +15,7 @@ try {
    status.textContent='Verified '+data.current_member.display_name+' — '+data.gigs.length+' gigs loaded securely.';
    for(const gig of data.gigs.filter(g=>g.event_date>=new Date().toISOString().slice(0,10))){
     const item=document.createElement('p');
-    item.textContent=g.event_date+' — '+gig.venue+' — '+gig.start_time;
+    item.textContent=gig.event_date+' — '+gig.venue+' — '+gig.start_time;
     output.append(item);
    }
   }
