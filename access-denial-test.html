@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BandSync access denial test</title><style>body{font:16px system-ui;background:#121018;color:#f8f5fd;max-width:640px;margin:auto;padding:24px}button{padding:14px;background:#603994;color:#fff;border:0;border-radius:10px;font-size:1rem}section{padding:16px;margin-top:12px;background:#22202c;border-radius:12px}p{line-height:1.5}</style></head><body><h1>BandSync: Unauthorized Access Check</h1><p>This tests whether the protected BPE calendar rejects requests with no login and a fabricated invalid token. It never uses your saved login and never changes band membership.</p><button id="go">Run safe denial tests</button><section id="out" role="status">No tests run yet.</section><script>
+const endpoint='https://rnqhltkpocodvybovlss.supabase.co/functions/v1/bpe-private-portal-data';
+const out=document.getElementById('out');
+document.getElementById('go').onclick=async()=>{
+ out.replaceChildren();document.getElementById('go').disabled=true;
+ for(const test of [{label:'No login',headers:{}},{label:'Invalid login token',headers:{Authorization:'Bearer invalid-bandsync-security-test'}}]){
+  const line=document.createElement('p');
+  line.textContent=test.label+': checking…';out.append(line);
+  try{
+   const response=await fetch(endpoint,{method:'GET',mode:'cors',cache:'no-store',headers:test.headers});
+   const body=await response.json();
+   const leaks=Array.isArray(body.gigs)||Array.isArray(body.members);
+   line.textContent=test.label+': '+((response.status===401&&!leaks)?'PASS — rejected (401), no private data returned':'REVIEW — HTTP '+response.status+(leaks?' and private data returned':'') );
+  }catch(e){line.textContent=test.label+': INCONCLUSIVE — '+e.message}
+ }
+ document.getElementById('go').disabled=false;
+};
+</script></body></html>
