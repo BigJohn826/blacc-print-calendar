@@ -1,7 +1,7 @@
 {
-  "name": "BPE Member Setup Pilot",
-  "short_name": "BPE Setup",
-  "description": "Secure BPE member registration and notifications setup",
+  "name": "BPE Portal",
+  "short_name": "BPE Portal",
+  "description": "Blacc Print Experience secure member portal, onboarding, gig schedule and notifications",
   "start_url": "./member-onboarding-pilot.html",
   "scope": "./",
   "display": "standalone",
