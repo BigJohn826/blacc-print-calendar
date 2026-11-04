@@ -33,8 +33,12 @@ async function openPrivatePortal(){
  try{
   const {data:{session}}=await client.auth.getSession();
   if(!session){showLogin('Sign in to view the private BPE calendar.');return;}
-  lock('Verifying active BPE membership…');
-  $('gateLogin').hidden=true;
+  // Keep the authorized portal visible during periodic membership rechecks.
+  // The protected request still runs; revoked membership immediately triggers lock().
+  if(!approved){
+   lock('Verifying active BPE membership…');
+   $('gateLogin').hidden=true;
+  }
   const response=await window.privatePortalFetch();
   const data=await response.json();
   applyPortalData(data);
