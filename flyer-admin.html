@@ -22,11 +22,11 @@ button.secondary{background:#292637}a{color:#cab0f5}.hint{font-size:.9rem}.hidde
 <section id="login">
 <h2>Administrator sign-in</h2>
 <label for="email">Approved email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
-<button id="send">Email me a sign-in link</button>
-<p class="hint">Open the link in the same browser. Access is verified against the administrator list; simply choosing a band member's name does not grant access.</p>
+<label for="password">Admin password (if already set)</label><input id="password" type="password" autocomplete="current-password" placeholder="Enter your admin password"><button id="passwordLogin">Sign in with password</button><button id="send" class="secondary">Email me a sign-in link</button>
+<p class="hint">On the installed Home Screen portal, use password sign-in. To set your password the first time, sign in by email link in Safari, then use Set Admin Password below. Only approved BPE admins can manage flyers.</p>
 </section>
 <section id="manager" class="hidden">
-<p id="signedIn" class="small"></p><button id="logout" class="secondary">Sign out</button>
+<p id="signedIn" class="small"></p><details id="passwordSetup"><summary>Set or change admin password</summary><p class="hint">For secure sign-in from the BPE Home Screen icon. Use a unique password of at least 12 characters, preferably saved in your password manager.</p><label for="newPassword">New admin password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="12"><label for="confirmPassword">Confirm new password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="12"><button id="setPassword">Save admin password</button></details><button id="logout" class="secondary">Sign out</button>
 <label for="gig">Choose a show</label><select id="gig"><option value="">Loading gigs…</option></select>
 <p id="showDetails" class="hint"></p>
 <label for="image">Flyer image (JPEG, PNG or WebP; maximum 10 MB)</label>
@@ -82,6 +82,32 @@ $('image').addEventListener('change',()=>{
  currentFile=file;
  $('preview').src=URL.createObjectURL(file);$('preview').classList.remove('hidden');
  message('Flyer selected. Confirm the correct show before uploading.');updateForm();
+});
+$('passwordLogin').addEventListener('click',async()=>{
+ const email=$('email').value.trim().toLowerCase(),password=$('password').value;
+ if(!email||!password){message('Enter your approved email and admin password.');return;}
+ $('passwordLogin').disabled=true;message('Signing in…');
+ try{
+  const {error}=await supabase.auth.signInWithPassword({email,password});
+  $('password').value='';
+  if(error){message('Password sign-in failed: '+error.message);return;}
+  await refresh();
+ }catch(e){message('Password sign-in failed: '+(e?.message||e));}
+ finally{$('passwordLogin').disabled=false;}
+});
+$('setPassword').addEventListener('click',async()=>{
+ const pass=$('newPassword').value,confirm=$('confirmPassword').value;
+ if(pass.length<12){message('Choose a password of at least 12 characters.');return;}
+ if(pass!==confirm){message('The passwords do not match.');return;}
+ $('setPassword').disabled=true;message('Saving admin password…');
+ try{
+  const {error}=await supabase.auth.updateUser({password:pass});
+  if(error){message('Could not set password: '+error.message);return;}
+  $('newPassword').value='';$('confirmPassword').value='';
+  $('passwordSetup').open=false;
+  message('Admin password saved. Open the BPE Home Screen icon, tap Manage Flyers, and sign in with your email and password.');
+ }catch(e){message('Could not set password: '+(e?.message||e));}
+ finally{$('setPassword').disabled=false;}
 });
 $('send').addEventListener('click',async()=>{
  const email=$('email').value.trim().toLowerCase();if(!email){message('Enter your approved email address.');return;}
