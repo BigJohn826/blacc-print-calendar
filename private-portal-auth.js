@@ -4,9 +4,10 @@ const key='sb_publishable_UDefNmZZ9P48SBI4yFYBCg_LQOMr44a';
 const client=createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=id=>document.getElementById(id);
 const endpoint=url+'/functions/v1/bpe-private-portal-data';
-let busy=false,approved=false;
+let busy=false,approved=false,lastDataSignature=null;
 function lock(message){
  approved=false;
+ lastDataSignature=null;
  document.body.classList.add('private-locked');
  $('privateGate').hidden=false;
  $('gateStatus').textContent=message;
@@ -41,7 +42,13 @@ async function openPrivatePortal(){
   }
   const response=await window.privatePortalFetch();
   const data=await response.json();
-  applyPortalData(data);
+  // Revalidate authorization every cycle, but only redraw if data actually changed.
+  // This avoids a visible layout reset on the normal 30-second security heartbeat.
+  const signature=JSON.stringify(data);
+  if(!approved||signature!==lastDataSignature){
+   applyPortalData(data);
+   lastDataSignature=signature;
+  }
   approved=true;
   document.body.classList.remove('private-locked');
   $('privateGate').hidden=true;
