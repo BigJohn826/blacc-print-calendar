@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101017"><title>BPE Member Access Pilot</title>
+<style>body{margin:0;background:#101017;color:#f8f7fb;font:16px system-ui,-apple-system,sans-serif;padding:20px}main{max-width:510px;margin:28px auto;background:#1c1b27;border:1px solid #433e52;border-radius:20px;padding:25px}h1{font-size:1.6rem}p{line-height:1.5;color:#cecadb}label{display:block;margin:14px 0 6px}input,button{font:inherit;display:block;width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #666075;background:#272535;color:white}button{background:#773da7;border:0;margin:15px 0;font-weight:700;cursor:pointer}button.secondary{background:#363143}button:disabled{opacity:.5}#result{white-space:pre-wrap;background:#292638;border-radius:10px;padding:12px;min-height:36px}.hidden{display:none}a{color:#dcc3f5}</style></head>
+<body><main><p><a href="./">← Existing BPE portal</a></p><h1>Member Access Pilot</h1>
+<p>This is a private-login test, not the replacement portal. The current BPE calendar remains available during the transition.</p>
+<section id="login"><label for="email">Your approved email</label><input id="email" type="email" autocomplete="email" value="jwr826@gmail.com"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password"><button id="signIn">Sign in</button><p>Use the same Supabase account password you established for Flyer Manager. Please do not send your password in chat.</p></section>
+<section id="signed" class="hidden"><p id="identity"></p><button id="check">Check my BPE membership</button><button id="signOut" class="secondary">Sign out</button></section>
+<div role="status" aria-live="polite" id="result">Checking for an existing session…</div>
+<p><small>A successful test confirms your account and authorization. Gig details remain on the existing portal until the complete private-data migration is tested.</small></p></main>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/+esm';
+const supabase=createClient('https://rnqhltkpocodvybovlss.supabase.co','sb_publishable_UDefNmZZ9P48SBI4yFYBCg_LQOMr44a',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=id=>document.getElementById(id),status=s=>$('result').textContent=s;
+async function check(){const {data:{session}}=await supabase.auth.getSession();if(!session){$('signed').classList.add('hidden');$('login').classList.remove('hidden');status('Sign in to test your BPE membership.');return}
+$('login').classList.add('hidden');$('signed').classList.remove('hidden');$('identity').textContent='Signed in as '+session.user.email;
+try{const response=await fetch('https://rnqhltkpocodvybovlss.supabase.co/functions/v1/bpe-member-access-check',{headers:{Authorization:'Bearer '+session.access_token,apikey:'sb_publishable_UDefNmZZ9P48SBI4yFYBCg_LQOMr44a'},cache:'no-store'});const result=await response.json();if(response.ok&&result.authenticated)status('✅ Verified active BPE '+result.access_role+' membership. Persistent sign-in is working.');else status('Access check: '+(result.error||'Request denied')+' ('+response.status+').')}catch(e){status('Unable to verify membership: '+e.message)}}
+$('signIn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||!password){status('Enter email and password.');return}$('signIn').disabled=true;status('Signing in…');try{const {error}=await supabase.auth.signInWithPassword({email,password});$('password').value='';if(error)status(error.message);else await check()}finally{$('signIn').disabled=false}};
+$('check').onclick=check;
+$('signOut').onclick=async()=>{await supabase.auth.signOut();await check()};
+supabase.auth.onAuthStateChange(()=>setTimeout(check,0));
+check();
+</script></body></html>
