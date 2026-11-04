@@ -160,19 +160,19 @@ function fmtMonth(d){return d.toLocaleDateString("en-US",{month:"long",year:"num
 function fmtDay(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
 function mapsUrl(loc){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(loc)}
 function statusClass(s){return s==="Confirmed"?"confirmed":"pending"}
-function defaultArrival(start){
+function defaultArrival(start,basis='performance'){
  if(!start||start==="TBD"||start==="Trip Hold"||start==="Canceled")return "";
  const m=start.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
  if(!m)return "";
  let h=parseInt(m[1],10),min=parseInt(m[2],10),ampm=m[3].toUpperCase();
  if(ampm==="PM"&&h!==12)h+=12;
  if(ampm==="AM"&&h===12)h=0;
- let total=h*60+min-30;if(total<0)total+=1440;
+ let total=h*60+min+(basis==='event'?30:-30);if(total<0)total+=1440;
  h=Math.floor(total/60)%24;min=total%60;
  const outAmpm=h>=12?"PM":"AM";let outH=h%12;if(outH===0)outH=12;
  return outH+":"+String(min).padStart(2,"0")+" "+outAmpm;
 }
-function arrivalFor(e){return e.arrival||defaultArrival(e.start)}
+function arrivalFor(e){return e.arrival||defaultArrival(e.start,e.timeBasis)}
 function validClock(t){return /^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(t||"")}
 function parseClock(t){
  const m=t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);if(!m)return null;
@@ -289,7 +289,7 @@ let bandMembers=[];
 function applyPortalData(source){
  bandMembers=(source.members||[]).map(m=>({id:m.id,name:m.display_name,role:m.role||""}));
  events=(source.gigs||[]).map(g=>({
-  date:g.event_date??g.date,start:g.start_time??g.start,end:g.end_time??g.end,
+  date:g.event_date??g.date,start:g.start_time??g.start,end:g.end_time??g.end,timeBasis:g.time_basis??'performance',
   venue:g.venue,location:g.location||"",status:g.status||"Needs Details",
   arrival:g.arrival_time??g.arrival??"",attire:g.attire||"",notes:g.notes||"",
   recurring:!!g.recurring,flyer:g.flyer_url??g.flyer??null,unavailable:g.unavailable||[]
