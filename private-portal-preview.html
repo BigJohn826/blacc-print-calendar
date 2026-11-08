@@ -201,49 +201,50 @@ function renderRecentUpdates(){
  const weekStart=new Date(today);weekStart.setDate(today.getDate()-today.getDay());
  const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
  const fmtISO=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
- const within=e=>e.date>=fmtISO(weekStart)&&e.date<=fmtISO(weekEnd);
- const weekGigs=upcoming.filter(within);
- // No remaining gigs = don't use valuable screen space for stale announcements.
- if(!weekGigs.length){section.hidden=true;list.replaceChildren();return;}
- section.hidden=false;
- document.getElementById("weeklyNotesRange").textContent=weekStart.toLocaleDateString("en-US",{month:"short",day:"numeric"})+"–"+weekEnd.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+ const weekGigs=upcoming.filter(e=>e.date>=fmtISO(weekStart)&&e.date<=fmtISO(weekEnd));
+ const monthNumbers={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+ const dateMatches=(title,includeCanceled=false)=>{
+  const matches=[...String(title).matchAll(/\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s*(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?/gi)];
+  return matches.some(match=>{
+   const month=monthNumbers[match[1].slice(0,3).toLowerCase()],first=Number(match[2]),last=Number(match[3]||match[2]);
+   if(includeCanceled){for(let n=first;n<=last;n++){const d=new Date(weekStart.getFullYear(),month-1,n);if(d>=weekStart&&d<=weekEnd)return true;}}
+   return weekGigs.some(g=>{const d=parseDate(g.date);return d.getMonth()+1===month&&d.getDate()>=first&&d.getDate()<=last});
+  });
+ };
  const notes=[];
- // Live availability is authoritative. Never use old availability update text.
+ // Cancellations remain visible even when the canceled gig is removed.
+ for(const u of recentUpdates){
+  if(/cancel(?:ed|led)/i.test(u.title)&&dateMatches(u.title,true)){
+   notes.push({title:u.title,body:u.text,alert:true});
+  }
+ }
+ // Current availability comes from the active schedule, not stale announcements.
  for(const gig of weekGigs){
   const unavailable=unavailableFor(gig);
   if(unavailable.length)notes.push({title:fmtDay(parseDate(gig.date))+" — "+gig.venue,body:unavailable.join(", ")+" unavailable",alert:true});
  }
- // Changes are only eligible when explicitly date-linked to an active gig this week.
- // Exclude old time/availability copy; current gig fields are always authoritative.
- const monthNumbers={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
- function dateMatches(text){
-  const matches=[...String(text).matchAll(/\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s*(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?/gi)];
-  return matches.some(match=>{
-   const m=monthNumbers[match[1].slice(0,3).toLowerCase()];
-   const a=Number(match[2]),b=Number(match[3]||match[2]);
-   return weekGigs.some(g=>{const d=parseDate(g.date);return d.getMonth()+1===m&&d.getDate()>=a&&d.getDate()<=b});
-  });
- }
+ // Include at most the newest three relevant announcements, excluding outdated availability/timing notices.
  for(const u of recentUpdates){
+  if(/cancel(?:ed|led)|availability|arrival|time added|details updated|added/i.test(u.title))continue;
   if(!dateMatches(u.title))continue;
-  // Arrival, attire and availability are generated from current records below.
-  if(/availability|arrival|time added|details updated|added/i.test(u.title))continue;
-  if(notes.length>=3)break;
   notes.push({title:u.title,body:u.text,alert:u.alert});
+  if(notes.length>=3)break;
  }
- // When no current-week changes exist, show the practical essentials instead.
+ if(!notes.length&&!weekGigs.length){section.hidden=true;list.replaceChildren();return;}
  if(!notes.length){
   for(const gig of weekGigs.slice(0,3)){
    notes.push({title:fmtDay(parseDate(gig.date))+" — "+gig.venue,body:"Arrival: "+(arrivalFor(gig)||"TBD")+" · Attire: "+(gig.attire||"Not announced"),alert:false});
   }
  }
+ section.hidden=false;
+ document.getElementById("weeklyNotesRange").textContent=weekStart.toLocaleDateString("en-US",{month:"short",day:"numeric"})+"–"+weekEnd.toLocaleDateString("en-US",{month:"short",day:"numeric"});
  list.replaceChildren();
  for(const n of notes.slice(0,3)){
   const entry=document.createElement("div");entry.className="update"+(n.alert?" alert":"");
   const dot=document.createElement("div");dot.className="dot";
-  const content=document.createElement("div"),header=document.createElement("b"),body=document.createElement("span");
-  header.textContent=n.title;body.textContent=n.body;
-  content.append(header,body);entry.append(dot,content);list.append(entry);
+  const content=document.createElement("div"),heading=document.createElement("b"),body=document.createElement("span");
+  heading.textContent=n.title;body.textContent=n.body;
+  content.append(heading,body);entry.append(dot,content);list.append(entry);
  }
 }
 function renderNext(){
