@@ -108,13 +108,15 @@ body.private-locked .wrap{display:none}#privateGate{padding:24px;max-width:510px
   <div class="install-bar" id="installBar"><button class="btn secondary" id="installBtn" type="button">Install Portal</button></div>
   <div class="utility-row"><button class="btn secondary" id="notifyBtn" type="button">Enable Notifications</button><button class="btn secondary" id="refreshBtn" type="button">↻ Refresh</button><button class="btn secondary" id="shareBtn" type="button">Share Portal</button><button class="btn secondary" id="copyBtn" type="button">Copy Link</button><a class="btn secondary" href="mailto:music4lifebeats@gmail.com?subject=BPE%20Portal%20Update&body=Date%3A%0AVenue%3A%0APerformance%20Time%3A%0AArrival%20Time%20(if%20different%20from%2030%20minutes%20prior)%3A%0ALocation%3A%0AAttire%3A%0ANotes%3A" id="updateRequest">Submit Update</a></div>
 
-  <div class="section-title"><h3>Recent Updates</h3><span>Latest important changes</span></div>
-  <div class="card">
-    <div class="update-list" id="recentUpdates"></div>
-  </div>
-
   <div class="section-title"><h3>Next Gig</h3><span>Up next</span></div>
   <div class="card next" id="nextGig"></div>
+
+  <section id="weeklyNotesSection" hidden>
+    <div class="section-title"><h3>This Week's Notes</h3><span id="weeklyNotesRange">Sunday–Saturday</span></div>
+    <div class="card">
+      <div class="update-list" id="recentUpdates"></div>
+    </div>
+  </section>
 
   <div class="section-title"><h3>Next Gig Flyer</h3><span id="flyerMonthLabel">Up next</span></div>
   <div class="flyer-grid" id="currentFlyers"></div>
@@ -195,8 +197,54 @@ function downloadICS(e){
  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function renderRecentUpdates(){
- const el=document.getElementById("recentUpdates");
- el.innerHTML=recentUpdates.slice(0,5).map(u=>'<div class="update'+(u.alert?' alert':'')+'"><div class="dot"></div><div><b>'+u.title+'</b><span>'+u.text+'</span></div></div>').join('');
+ const section=document.getElementById("weeklyNotesSection"),list=document.getElementById("recentUpdates");
+ const weekStart=new Date(today);weekStart.setDate(today.getDate()-today.getDay());
+ const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
+ const fmtISO=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+ const within=e=>e.date>=fmtISO(weekStart)&&e.date<=fmtISO(weekEnd);
+ const weekGigs=upcoming.filter(within);
+ // No remaining gigs = don't use valuable screen space for stale announcements.
+ if(!weekGigs.length){section.hidden=true;list.replaceChildren();return;}
+ section.hidden=false;
+ document.getElementById("weeklyNotesRange").textContent=weekStart.toLocaleDateString("en-US",{month:"short",day:"numeric"})+"–"+weekEnd.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+ const notes=[];
+ // Live availability is authoritative. Never use old availability update text.
+ for(const gig of weekGigs){
+  const unavailable=unavailableFor(gig);
+  if(unavailable.length)notes.push({title:fmtDay(parseDate(gig.date))+" — "+gig.venue,body:unavailable.join(", ")+" unavailable",alert:true});
+ }
+ // Changes are only eligible when explicitly date-linked to an active gig this week.
+ // Exclude old time/availability copy; current gig fields are always authoritative.
+ const monthNumbers={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+ function dateMatches(text){
+  const matches=[...String(text).matchAll(/\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s*(\d{1,2})(?:\s*[–-]\s*(\d{1,2}))?/gi)];
+  return matches.some(match=>{
+   const m=monthNumbers[match[1].slice(0,3).toLowerCase()];
+   const a=Number(match[2]),b=Number(match[3]||match[2]);
+   return weekGigs.some(g=>{const d=parseDate(g.date);return d.getMonth()+1===m&&d.getDate()>=a&&d.getDate()<=b});
+  });
+ }
+ for(const u of recentUpdates){
+  if(!dateMatches(u.title))continue;
+  // Arrival, attire and availability are generated from current records below.
+  if(/availability|arrival|time added|details updated|added/i.test(u.title))continue;
+  if(notes.length>=3)break;
+  notes.push({title:u.title,body:u.text,alert:u.alert});
+ }
+ // When no current-week changes exist, show the practical essentials instead.
+ if(!notes.length){
+  for(const gig of weekGigs.slice(0,3)){
+   notes.push({title:fmtDay(parseDate(gig.date))+" — "+gig.venue,body:"Arrival: "+(arrivalFor(gig)||"TBD")+" · Attire: "+(gig.attire||"Not announced"),alert:false});
+  }
+ }
+ list.replaceChildren();
+ for(const n of notes.slice(0,3)){
+  const entry=document.createElement("div");entry.className="update"+(n.alert?" alert":"");
+  const dot=document.createElement("div");dot.className="dot";
+  const content=document.createElement("div"),header=document.createElement("b"),body=document.createElement("span");
+  header.textContent=n.title;body.textContent=n.body;
+  content.append(header,body);entry.append(dot,content);list.append(entry);
+ }
 }
 function renderNext(){
  const e=upcoming[0],el=document.getElementById("nextGig");
