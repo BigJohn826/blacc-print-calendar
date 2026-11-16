@@ -57,10 +57,12 @@ async function refresh(){
   showLogin();message('This account is not approved to manage BPE flyers. Ask the BandSync administrator to authorize it.');return;
  }
  showManager(user);
- const {data,error:gigError}=await supabase.from('gigs').select('id,event_date,venue,start_time,flyer_url').order('event_date',{ascending:true});
+ const today=new Date();
+ const localDate=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+ const {data,error:gigError}=await supabase.from('gigs').select('id,event_date,venue,start_time,flyer_url').gte('event_date',localDate).order('event_date',{ascending:true});
  if(gigError){message('Could not load gigs: '+gigError.message);return;}
  gigs=data||[];
- const select=$('gig');select.replaceChildren(new Option('Select a show…',''));
+ const select=$('gig');select.replaceChildren(new Option(gigs.length?'Select a show…':'No upcoming shows available',''));
  for(const g of gigs) select.add(new Option(g.event_date+' · '+g.venue+' · '+g.start_time,g.id));
  message('Choose an existing show and a flyer image.');
  updateForm();
