@@ -350,7 +350,7 @@ function applyPortalData(source){
   member:a.member_name??a.member,start:a.start_date??a.start,end:a.end_date??a.end,notes:a.notes||""
  }));
  if(!events.length)throw new Error("No gig data returned");
- upcoming=events.filter(e=>parseDate(e.date)>=today).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+ upcoming=events.filter(e=>parseDate(e.date)>=today && !/^(cancelled|canceled)$/i.test((e.status||"").trim())).sort((a,b)=>parseDate(a.date)-parseDate(b.date));
  archived=events.filter(e=>parseDate(e.date)<today).sort((a,b)=>parseDate(b.date)-parseDate(a.date));
  renderRecentUpdates();renderNext();renderWeek();renderCurrentFlyers();renderSchedule();renderArchive();
 }
